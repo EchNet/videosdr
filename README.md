@@ -1,17 +1,12 @@
-## Implementing bulk CSV ingestion to Amazon DynamoDB
 
-This repository is used in conjunction with the following blog post: 
+CloudFormation template CSVToDynamo.template
 
-You can use your own CSV file or download the test file we provided in this repo. 
+Listens for uploads to a specific file in a specific S3 bucket and loads the contents of that file into a DynamoDB table.
 
-Steps to Download CloudFormation template:
-1. Navigate to CloudFormation folder in this repo.
-2. Click on CSVToDynamo.template.
-3. Click on the Raw button.
-4. Save Page As > Remove any file extensions so that the file reads like "CSVToDynamo.template". Click save.
+The file must be in CSV format.  The first line of the file contains headers.  The first header must be uuid and the contents of this column must contain unique keys for each row.  The remaining headers and column data are arbitrary.
 
+Required Parameters:
 
-## License
-
-This library is licensed under the MIT-0 License. See the LICENSE file.
-
+BucketName          The name of the S3 bucket (Do not create the bucket, let CloudFormation do it.)
+FileName            The name of the file in the bucket to watch for uploads.
+DynamoDBTableName   The name of the DynamoDB table (Let CloudFormation create it)
