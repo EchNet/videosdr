@@ -1,7 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Metadata": {
-
     },
     "Parameters" : {
         "BucketName": {
@@ -10,12 +9,12 @@
             "ConstraintDescription": "must be a valid bucket name."
         },
         "FileName": {
-            "Description": "Name of the S3 file (including suffix)",
+            "Description": "Name of the S3 file (including path and suffix)",
             "Type": "String",
             "ConstraintDescription": "Valid S3 file name."
         },
         "DynamoDBTableName": {
-            "Description": "Name of the dynamoDB table you will use",
+            "Description": "Name of the dynamoDB table",
             "Type": "String",
             "ConstraintDescription": "must be a valid dynamoDB name."
         }
@@ -203,6 +202,5 @@
         }
     },
     "Outputs" : {
-
     }
 }
