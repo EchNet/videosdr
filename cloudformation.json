@@ -28,13 +28,13 @@
                 "BillingMode": "PAY_PER_REQUEST",
                 "AttributeDefinitions":[
                     {
-                        "AttributeName": "uuid",
+                        "AttributeName": "key",
                         "AttributeType": "S"
                     }
                 ],
                 "KeySchema":[
                     {
-                        "AttributeName": "uuid",
+                        "AttributeName": "key",
                         "KeyType": "HASH"
                     }
                 ],
