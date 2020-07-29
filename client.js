@@ -31,7 +31,7 @@
     history.replaceState("", "", location.origin + location.pathname);
   }
 })(
-  "https://946frrug34.execute-api.us-east-1.amazonaws.com/test/getvideoparams",
+  "https://almqm0z6kf.execute-api.us-east-1.amazonaws.com/live/getvideoparams",
   "76a79067-e3df-4acc-9fbc-2cddf8f19740",
   "final_product_demo",
   "my-video"

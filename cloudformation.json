@@ -65,21 +65,22 @@
             "Path" : "/",
             "ManagedPolicyArns":["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole","arn:aws:iam::aws:policy/AWSLambdaInvocation-DynamoDB","arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"],
             "Policies": [{
-					         "PolicyName": "policyname",
-					         "PolicyDocument": {
-						               "Version": "2012-10-17",
-						               "Statement": [{
-                                    "Effect": "Allow",
-  							                    "Resource": "*",
-							                      "Action": [
-								                              "dynamodb:PutItem",
-                                                              "dynamodb:BatchWriteItem"
-							                      ]
-						              }]
-					         }
-				    }]
+              "PolicyName": "policyname",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                  "Effect": "Allow",
+                  "Resource": "*",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:BatchWriteItem"
+                  ]
+                }]
+              }
+            }]
           }
-       },
+        },
+
         "CsvToDDBLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
