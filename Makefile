@@ -22,7 +22,3 @@ formation: check-env build/cloudformation.json
 
 logs:
 	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} cloudformation describe-stack-events --stack-name csv-to-dynamo1
-
-upload_data:
-	(cd csv; aws --profile ${AWS_PROFILE} --region ${AWS_REGION} s3 cp VideoParams.csv s3://${S3_BUCKET_NAME})
-	(cd csv; aws --profile ${AWS_PROFILE} --region ${AWS_REGION} s3 cp VideoParams1.csv s3://${S3_BUCKET_NAME})

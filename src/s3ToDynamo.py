@@ -21,6 +21,7 @@ def lambda_handler(event, context):
   batch = []
 
   for row in csv.DictReader(codecs.getreader('utf-8')(obj)):
+    row.pop("", None)  # Drop empty field names.
     if len(batch) >= batch_size:
       write_to_dynamo(batch)
       batch.clear()
