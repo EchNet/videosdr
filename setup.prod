@@ -1,3 +1,4 @@
 export AWS_PROFILE=videosdr
 export AWS_REGION=us-east-1
 export S3_BUCKET_NAME=data.videosdr.com
+export CODE_BUCKET_NAME=code.videosdr.com
