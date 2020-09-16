@@ -1,27 +1,27 @@
 {
+    "Description": "Data ingest process: Watch an S3 bucket for uploaded CSV files, load the contents of each into DynamoDB.",
     "AWSTemplateFormatVersion": "2010-09-09",
     "Metadata": {
+        "Comment": ""
     },
     "Parameters" : {
         "BucketName": {
-            "Description": "Name of the S3 bucket you will deploy the CSV file to",
+            "Description": "(REQUIRED) Name of the S3 bucket to watch for ",
             "Type": "String",
             "ConstraintDescription": "must be a valid bucket name."
         },
-        "FileName": {
-            "Description": "Name of the S3 file (including path and suffix)",
-            "Type": "String",
-            "ConstraintDescription": "Valid S3 file name."
-        },
         "DynamoDBTableName": {
-            "Description": "Name of the dynamoDB table",
+            "Description": "(REQUIRED) Name of the DynamoDB table",
             "Type": "String",
-            "ConstraintDescription": "must be a valid dynamoDB name."
+            "ConstraintDescription": "must be a valid DynamoDB table name."
         }
     },
     "Resources": {
         "DynamoDBTable":{
             "Type": "AWS::DynamoDB::Table",
+            "Metadata": {
+                "Comment": ""
+            },
             "Properties":{
                 "TableName": {"Ref" : "DynamoDBTableName"},
                 "BillingMode": "PAY_PER_REQUEST",
@@ -95,7 +95,7 @@
                     "ZipFile": {
                         "Fn::Join": [
                             "\n",
-                            {{=fs.readFileSync('build/s3ToDynamo.py.jsa', 'utf-8')}}
+                            {{=require("../tools/jsonutils").formatAsJsonList("./s3ToDynamo.py")}}
                         ]
                     }
                 },
@@ -103,7 +103,7 @@
                 "Timeout": 900,
                 "MemorySize": 3008,
                 "Environment" : {
-                    "Variables" : {"bucket" : { "Ref" : "BucketName" }, "key" : { "Ref" : "FileName" },"table" : { "Ref" : "DynamoDBTableName" }}
+                    "Variables" : {"bucket" : { "Ref" : "BucketName" }, "table" : { "Ref" : "DynamoDBTableName" }}
                 }
             }
         },

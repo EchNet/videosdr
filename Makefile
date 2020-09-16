@@ -1,24 +1,43 @@
-default: formation
+build: build-client build-ingest build-dataservice
 
-check-env:
-ifndef AWS_PROFILE
-	$(error AWS_PROFILE is undefined)
-endif
-ifndef AWS_REGION
-	$(error AWS_REGION is undefined)
-endif
-ifndef S3_BUCKET_NAME
-	$(error S3_BUCKET_NAME is undefined)
-endif
+test: test-client test-ingest test-dataservice
 
-build/s3ToDynamo.py.jsa: src/s3ToDynamo.py
-	node tojsa.js src/s3ToDynamo.py > build/s3ToDynamo.py.jsa
+deploy: deploy-client deploy-ingest deploy-dataservice
 
-build/cloudformation.json: cloudformation.dot build/s3ToDynamo.py.jsa
-	node -r fs -e 'console.log(JSON.stringify(JSON.parse(require("dot").template(fs.readFileSync("cloudformation.dot", "utf-8"))({})), null, 4));' > build/cloudformation.json
+clean: clean-client clean-ingest clean-dataservice
 
-formation: check-env build/cloudformation.json
-	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} cloudformation deploy --stack-name csv-to-dynamo1 --template-file ./build/cloudformation.json --capabilities CAPABILITY_IAM --parameter-overrides BucketName=${S3_BUCKET_NAME} DynamoDBTableName=VideoParams
+build-client:
+	(cd client; make build)
 
-logs:
-	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} cloudformation describe-stack-events --stack-name csv-to-dynamo1
+build-ingest:
+	(cd ingest; make build)
+
+build-dataservice:
+	(cd dataservice; make build)
+
+test-client:
+	(cd client; make test)
+
+test-ingest:
+	(cd ingest; make test)
+
+test-dataservice:
+	(cd dataservice; make test)
+
+deploy-client:
+	(cd client; make deploy)
+
+deploy-ingest:
+	(cd ingest; make deploy)
+
+deploy-dataservice:
+	(cd dataservice; make deploy)
+
+clean-client:
+	(cd client; make clean)
+
+clean-ingest:
+	(cd ingest; make clean)
+
+clean-dataservice:
+	(cd dataservice; make clean)

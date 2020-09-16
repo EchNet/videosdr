@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Command line argument is the path to a JSON template file.
+#
+# The following command reads the JSON template file, processes it through dot, validates
+# and pretty-prints it.
+#
+node -r fs -p "JSON.stringify(JSON.parse(require('dot').template(fs.readFileSync(\"$1\", \"utf-8\"))({})), null, 2)"
