@@ -1,30 +1,43 @@
 (function() {
+  // Hide template text.
+  (function() {
+    var stylesheet = document.createElement("style");
+    stylesheet.innerHTML = ".videosdr-when-loaded { visibility: hidden; }";
+    document.head.appendChild(stylesheet);
+  })();
+
   // Polyfill for document.currentScript:
-  document.currentScript = document.currentScript || (function() {
+  const currentScript = document.currentScript || (function() {
     var scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })();
 
   // Get options.
   const options = (function(defaultOptions) {
+    const queryVars = currentScript.src.replace(/^[^\?]+\??/, "").split("&");
+    const queryStringOptions = {};
+    for (var i in queryVars) {
+      const pair = queryVars[i].split("=");
+      queryStringOptions[pair[0]] = decodeURI(pair[1]).replace(/\+/g, ' ');
+    }
+
     const options = {};
     for (var key in defaultOptions) {
-      options[key] = document.currentScript.getAttribute(key) || defaultOptions[key];
+      options[key] = currentScript.getAttribute("data-" + key)
+          || queryStringOptions[key] || defaultOptions[key];
     }
     return options;
   })({
     getVideoParamsUrl: "https://almqm0z6kf.execute-api.us-east-1.amazonaws.com/live/getvideoparams",
-    projectId: "76a79067-e3df-4acc-9fbc-2cddf8f19740",
-    movieName: "final_product_demo",
+    projectId: "",
+    movieName: "",
     videoElementId: "my-video"
   });
 
-  // Create required styles.
-  (function() {
-    var stylesheet = document.createElement("style");
-    stylesheet.innerHTML = ".videosdr-when-loaded { visibility: hidden; }";
-    document.head.appendChild(stylesheet);
-  })();
+  // Check for required options AFTER hiding template text.
+  if (!options.projectId || !options.movieName) {
+    throw("videosdr: missing project ID or movieName")
+  }
 
   // Bring in required Javascripts.
   (function(sources) {

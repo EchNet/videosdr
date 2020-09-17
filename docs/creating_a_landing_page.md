@@ -15,7 +15,7 @@
 Your code snippet will look something like this:
 
 ```
-<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js" projectId="<<<-your-impossible-io-project-id->>>" movieName="<<<-your-impossible-io-movie-name->>>"></script>
+<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js" data-projectId="<<<-your-impossible-io-project-id->>>" data-movieName="<<<-your-impossible-io-movie-name->>>"></script>
 ```
 
 ### 2.  Insert the video element
