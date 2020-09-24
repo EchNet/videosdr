@@ -26,3 +26,9 @@ logs: check-env
 
 clean:
 	rm -rf build
+
+data: build/data.txt
+
+build/data.txt:
+	mkdir -p build
+	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} dynamodb scan --table-name VideoParams --query "Items[*].[key.S,first_name.S,last_name.S,email.S]" --output text > build/data.txt
