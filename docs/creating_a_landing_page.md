@@ -25,7 +25,7 @@ Use following HTML fragment as a starting point.  It centers the video within th
 ```
 <h1 class="videosdr-when-loaded" style="visibility:hidden;text-align:center">{{ first_name }}, I have an idea for {{ company }}!</h1>
 <div style="width: 100%; display: flex; justify-content: center;">
-  <video id="my-video" controls="controls" style="max-width: 640px" width="100%"></video>
+  <video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" controls="controls" style="max-width: 640px" width="100%"></video>
 </div>
 ```
 
@@ -41,6 +41,8 @@ At minimum, the video element must include the `id` and `controls` attributes as
 <video id="my-video" controls="controls"></video>
 ```
 
+#### Sizing
+
 It is also recommended that you maximize the width of the video but limit it for larger screens.  The following fragment maximizes the width and places a limit of 640 pixels on it. 
 
 Do not specify a height for the image.  Instead let the video be displayed at its original aspect ratio.
@@ -49,6 +51,18 @@ Do not specify a height for the image.  Instead let the video be displayed at it
 <div style="width: 100%; display: flex; justify-content: center;">
   <video id="my-video" controls="controls" style="max-width: 640px" width="100%"></video>
 </div>
+```
+
+#### Placeholder
+
+Some time will pass between when the page loads and when the first frame of the video is loaded.
+During this time, it is better to show a "loading" animation image than the default black box.
+Use the "poster" attribute of the video element to refer to your placeholder image as shown below. 
+We provide `https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif` as a convenience but you
+may use your own image.
+
+```
+<video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" controls="controls"></video>
 ```
 
 ### Options for personalized text.

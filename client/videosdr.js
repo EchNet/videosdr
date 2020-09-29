@@ -1,4 +1,5 @@
 (function() {
+
   // Hide template text.
   (function() {
     var stylesheet = document.createElement("style");
@@ -39,16 +40,31 @@
     throw("videosdr: missing project ID or movieName")
   }
 
+  var prereqs = {};
+
   // Bring in required Javascripts.
-  (function(sources) {
-    for (var i in sources) {
-      var script = document.createElement("script")
-      script.src = sources[i];
-      document.head.appendChild(script)
+  (function(scripts) {
+    for (var i in scripts) {
+      (function(ss) {
+        var script = document.createElement("script");
+        script.src = ss.src;
+        console.log('script', ss);
+        script.addEventListener("load", function() {
+          console.log('load', ss);
+          markPrereq(ss.name);
+        });
+        document.head.appendChild(script)
+      })(scripts[i])
     }
   })([
-    "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js",
-    "https://cdn.impossible.io/support/fxplayer.js"
+    {
+      name: "mustache",
+      src: "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"
+    },
+    {
+      name: "fxplayer",
+      src: "https://cdn.impossible.io/support/fxplayer.js"
+    }
   ])
 
   // DOM utility.
@@ -79,6 +95,10 @@
       player.movie = options.movieName;
       player.params = params;
       player.play();
+
+      document.getElementById(options.videoElementId).oncanplay = function(event) {
+        event.target.removeAttribute("poster");
+      }
 
       // Apply params to page text.
       forEachElementOfClass("videosdr-when-loaded", function(ele) {
@@ -121,6 +141,16 @@
     history.replaceState("", "", location.origin + location.pathname);
   }
 
+  // Gate startup on required conditions.
+  function markPrereq(name) {
+    if (!prereqs[name]) {
+      prereqs[name] = true;
+      if (prereqs["mustache"] && prereqs["fxplayer"] && prereqs["page"]) {
+        getAndApplyParams()
+      }
+    }
+  }
+
   // Wait for page to load.
   function whenPageLoaded(callback) {
     if (document.readyState != "loading") {
@@ -134,7 +164,7 @@
     else {
       // Old browsers don't.
       document.attachEvent("onreadystatechange", function() {
-        if (document.readyState=='complete') {
+        if (document.readyState == "complete") {
           callback();
         }
       })
@@ -142,5 +172,5 @@
   }
 
   // Main.
-  whenPageLoaded(getAndApplyParams)
+  whenPageLoaded(function() { markPrereq("page") })
 })();
