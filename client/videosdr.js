@@ -121,6 +121,26 @@
     history.replaceState("", "", location.origin + location.pathname);
   }
 
+  // Wait for page to load.
+  function whenPageLoaded(callback) {
+    if (document.readyState != "loading") {
+      // The document is already loaded.
+      callback();
+    }
+    else if (document.addEventListener) {
+      // Modern browsers support DOMContentLoaded.
+      document.addEventListener("DOMContentLoaded", callback);
+    }
+    else {
+      // Old browsers don't.
+      document.attachEvent("onreadystatechange", function() {
+        if (document.readyState=='complete') {
+          callback();
+        }
+      })
+    }
+  }
+
   // Main.
-  getAndApplyParams()
+  whenPageLoaded(getAndApplyParams)
 })();

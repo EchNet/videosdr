@@ -1,0 +1,3 @@
+I propose making some improvements to the software:
+1. Whenever you upload data, you get a report in your email, including the number of records created and any errors that occurred.
+2. The ingest script ignores duplicate keys, but lists them in the email report.
