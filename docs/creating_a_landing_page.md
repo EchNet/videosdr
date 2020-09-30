@@ -25,7 +25,7 @@ Use following HTML fragment as a starting point.  It centers the video within th
 ```
 <h1 class="videosdr-when-loaded" style="visibility:hidden;text-align:center">{{ first_name }}, I have an idea for {{ company }}!</h1>
 <div style="width: 100%; display: flex; justify-content: center;">
-  <video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" controls="controls" style="max-width: 640px" width="100%"></video>
+  <video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" style="max-width: 640px" width="100%"></video>
 </div>
 ```
 
@@ -35,10 +35,10 @@ If you wish to customize this content, see below for Advanced Options.
 
 ### Options for the video element.
 
-At minimum, the video element must include the `id` and `controls` attributes as shown here:
+At minimum, the video element must include the `id` attribute as shown here:
 
 ```
-<video id="my-video" controls="controls"></video>
+<video id="my-video"></video>
 ```
 
 #### Sizing
@@ -49,7 +49,7 @@ Do not specify a height for the image.  Instead let the video be displayed at it
 
 ```
 <div style="width: 100%; display: flex; justify-content: center;">
-  <video id="my-video" controls="controls" style="max-width: 640px" width="100%"></video>
+  <video id="my-video" style="max-width: 640px" width="100%"></video>
 </div>
 ```
 
@@ -62,7 +62,7 @@ We provide `https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif` as a con
 may use your own image.
 
 ```
-<video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" controls="controls"></video>
+<video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif"></video>
 ```
 
 ### Options for personalized text.

@@ -48,9 +48,7 @@
       (function(ss) {
         var script = document.createElement("script");
         script.src = ss.src;
-        console.log('script', ss);
         script.addEventListener("load", function() {
-          console.log('load', ss);
           markPrereq(ss.name);
         });
         document.head.appendChild(script)
@@ -98,6 +96,7 @@
 
       document.getElementById(options.videoElementId).oncanplay = function(event) {
         event.target.removeAttribute("poster");
+        event.target.setAttribute("controls", "controls");
       }
 
       // Apply params to page text.
