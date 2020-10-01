@@ -94,9 +94,12 @@
       player.params = params;
       player.play();
 
-      document.getElementById(options.videoElementId).oncanplay = function(event) {
-        event.target.removeAttribute("poster");
-        event.target.setAttribute("controls", "controls");
+      var videoElement = document.getElementById(options.videoElementId)
+      videoElement.onloadeddata = function() {
+        videoElement.removeAttribute("poster");
+        videoElement.setAttribute("controls", "controls");
+        videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
+        videoElement.onloadeddata = null;
       }
 
       // Apply params to page text.
