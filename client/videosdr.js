@@ -85,6 +85,45 @@
     }
   }
 
+  function createBigPlayButton() {
+    var SIZE = 1024;
+
+    var videoControls = document.createElement("div");
+    videoControls.style.display = "none";
+    videoControls.style.position = "absolute";
+    videoControls.style.width = "80px";
+    videoControls.style.height = "80px";
+    videoControls.style.borderRadius = "50%";
+    videoControls.style.top = "50%";
+    videoControls.style.left = "50%";
+    videoControls.style.background = "#555";
+    videoControls.style.transform = "translate(-50%, -50%)";
+    videoControls.style.transition = "0.2s";
+    videoControls.onmouseover = function() {
+      videoControls.style.background = "#777";
+    }
+    videoControls.onmouseleave = function() {
+      videoControls.style.background = "#555";
+    }
+
+    var arrow = document.createElement("canvas");
+    arrow.width = SIZE;
+    arrow.height = SIZE;
+    arrow.style.width = "100%";
+    arrow.style.height = "100%";
+
+    var context = arrow.getContext("2d");
+    context.beginPath();
+    context.moveTo(SIZE / 3, SIZE / 4);
+    context.lineTo(SIZE * 3/4, SIZE / 2);
+    context.lineTo(SIZE / 3, SIZE * 3/4);
+    context.fillStyle = "white";
+    context.fill();
+
+    videoControls.appendChild(arrow);
+    return videoControls;
+  }
+
   function applyParams(params) {
     if (params) {
       // Apply params to video.
@@ -95,9 +134,21 @@
       player.play();
 
       var videoElement = document.getElementById(options.videoElementId)
-      videoElement.onloadeddata = function() {
-        videoElement.removeAttribute("poster");
+      videoElement.parentElement.style.position = "relative";
+
+      var videoControls = createBigPlayButton();
+      videoElement.after(videoControls);
+      videoControls.addEventListener("click", function(e) {
+        videoElement.play();
+        videoControls.style.display = "none";
         videoElement.setAttribute("controls", "controls");
+      });
+
+      videoElement.onloadeddata = function() {
+        // First frame is now available.  Remove placeholder image.
+        videoElement.removeAttribute("poster");
+        videoControls.style.display = "block";
+        // This hack is necessary for Safari, which does not automatically increase height.
         videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
         videoElement.onloadeddata = null;
       }
