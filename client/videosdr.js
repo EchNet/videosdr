@@ -136,11 +136,14 @@
       var videoElement = document.getElementById(options.videoElementId)
       videoElement.removeAttribute("controls");
       videoElement.parentElement.style.position = "relative";
+      videoElement.onclick = function() {
+        videoElement.paused && videoElement.play();
+      }
 
       var videoControls = createBigPlayButton();
       videoElement.after(videoControls);
       videoControls.onclick = function() {
-        videoElement.play();
+        videoElement.paused && videoElement.play();
       }
 
       videoElement.onloadeddata = function() {
