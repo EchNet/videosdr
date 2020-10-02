@@ -134,15 +134,14 @@
       player.play();
 
       var videoElement = document.getElementById(options.videoElementId)
+      videoElement.removeAttribute("controls");
       videoElement.parentElement.style.position = "relative";
 
       var videoControls = createBigPlayButton();
       videoElement.after(videoControls);
-      videoControls.addEventListener("click", function(e) {
+      videoControls.onclick = function() {
         videoElement.play();
-        videoControls.style.display = "none";
-        videoElement.setAttribute("controls", "controls");
-      });
+      }
 
       videoElement.onloadeddata = function() {
         // First frame is now available.  Remove placeholder image.
@@ -151,6 +150,10 @@
         // This hack is necessary for Safari, which does not automatically increase height.
         videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
         videoElement.onloadeddata = null;
+      }
+      videoElement.onplay = function () {
+        videoControls.style.display = "none";
+        videoElement.setAttribute("controls", "controls");
       }
 
       // Apply params to page text.
