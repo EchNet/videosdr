@@ -23,7 +23,7 @@ Your code snippet will look something like this:
 Use following HTML fragment as a starting point.  It centers the video within the page and limits its width to 640 pixels.  It places a personalized title above the image.  Place this fragment into the body of the page at the desired position for display.
 
 ```
-<h1 class="videosdr-when-loaded" style="visibility:hidden;text-align:center">{{ first_name }}, I have an idea for {{ company }}!</h1>
+<h1 class="videosdr-when-loaded" style="visibility:hidden;text-align:center">{{{ first_name }}}, I have an idea for {{{ company }}}!</h1>
 <div style="width: 100%; display: flex; justify-content: center;">
   <video id="my-video" poster="https://s3.amazonaws.com/assets.vidvoy.com/loading-bar.gif" style="max-width: 640px" width="100%"></video>
 </div>
@@ -69,16 +69,15 @@ may use your own image.
 
 You may create personalized text anywhere in the page.  The text can include any of the 
 field values associated with the contact the page is addressed to (e.g. first_name, company).
-Field names within double braces {{ }} are replaced with the values that they reference. 
+Field names within triple braces {{{ }}} are replaced with the values that they reference. 
 
 Personalized text must appear within an element having `class` attribute equal to videosdr-when-loaded, as shown below.  It is also recommended that you hide the element initially using a style attribute, as shown below. videosdr-when-loaded elements are automatically unhidden when the personalized data is ready.
 
 ```
-<h1 class="videosdr-when-loaded" style="visibility: hidden">Hi {{ first_name }}!</h1>
+<h1 class="videosdr-when-loaded" style="visibility: hidden">Hi {{{ first_name }}}!</h1>
 ```
 
-You may create as many video-sdr-when-loaded elements as you like.
-page, so that partial text is not displayed.
+You may create as many `video-sdr-when-loaded` elements as you like.
 
 Don't put videosdr-when-loaded elements inside other videosdr-when-loaded elements.
 
