@@ -1,145 +1,196 @@
 {
-    "Description": "Data ingest process: Watch an S3 bucket for uploaded CSV files, load the contents of each into DynamoDB.",
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Metadata": {
-        "Comment": ""
+  "Description": "Dynamic video marketing automation service",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Metadata": {
+    "Comment": "Resources for data ingest."
+  },
+  "Parameters": {
+    "BucketName": {
+      "Description": "(REQUIRED) Name of the S3 bucket to watch for ",
+      "Type": "String",
+      "ConstraintDescription": "must be a valid bucket name."
+    }
+  },
+  "Resources": {
+    "DynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Metadata": {
+        "Comment": "A table of contacts with parameters for dynamic video rendering."
+      },
+      "Properties": {
+        "TableName": "VideoParams",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoParams"
+          }
+        ]
+      }
     },
-    "Parameters" : {
-        "BucketName": {
-            "Description": "(REQUIRED) Name of the S3 bucket to watch for ",
-            "Type": "String",
-            "ConstraintDescription": "must be a valid bucket name."
-        },
-        "DynamoDBTableName": {
-            "Description": "(REQUIRED) Name of the DynamoDB table",
-            "Type": "String",
-            "ConstraintDescription": "must be a valid DynamoDB table name."
-        }
+    "videoCustomersDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Metadata": {
+        "Comment": "A table of customers of the service: name, Impossible.io credentials"
+      },
+      "Properties": {
+        "TableName": "VideoCustomers",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoCustomers"
+          }
+        ]
+      }
     },
-    "Resources": {
-        "DynamoDBTable":{
-            "Type": "AWS::DynamoDB::Table",
-            "Metadata": {
-                "Comment": ""
-            },
-            "Properties":{
-                "TableName": {"Ref" : "DynamoDBTableName"},
-                "BillingMode": "PAY_PER_REQUEST",
-                "AttributeDefinitions":[
-                    {
-                        "AttributeName": "key",
-                        "AttributeType": "S"
-                    }
-                ],
-                "KeySchema":[
-                    {
-                        "AttributeName": "key",
-                        "KeyType": "HASH"
-                    }
-                ],
-                "Tags":[
-                    {
-                        "Key": "Name",
-                        "Value": {"Ref" : "DynamoDBTableName"}
-                    }
-                ]
+    "videoCampaignsDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Metadata": {
+        "Comment": "A table of video campaigns: project ID and movie name."
+      },
+      "Properties": {
+        "TableName": "VideoCampaigns",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoCampaigns"
+          }
+        ]
+      }
+    },
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com", "s3.amazonaws.com"]
+              },
+              "Action": [ "sts:AssumeRole" ]
             }
+          ]
         },
-        "LambdaRole" : {
-          "Type" : "AWS::IAM::Role",
-          "Properties" : {
-            "AssumeRolePolicyDocument": {
-              "Version" : "2012-10-17",
-              "Statement" : [
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AWSLambdaInvocation-DynamoDB",
+          "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "bulkLoadDynamoDBPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
                 {
-                  "Effect" : "Allow",
-                  "Principal" : {
-                    "Service" : ["lambda.amazonaws.com","s3.amazonaws.com"]
-                  },
-                  "Action" : [
-                    "sts:AssumeRole"
-                  ]
-                }
-              ]
-            },
-            "Path" : "/",
-            "ManagedPolicyArns":["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole","arn:aws:iam::aws:policy/AWSLambdaInvocation-DynamoDB","arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"],
-            "Policies": [{
-              "PolicyName": "policyname",
-              "PolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [{
                   "Effect": "Allow",
                   "Resource": "*",
-                  "Action": [
-                    "dynamodb:PutItem",
-                    "dynamodb:BatchWriteItem"
-                  ]
-                }]
-              }
-            }]
+                  "Action": [ "dynamodb:PutItem", "dynamodb:BatchWriteItem" ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CsvToDDBLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              {{=require("../tools/jsonutils").formatAsJsonList("./s3ToDynamo.py")}}
+            ]
           }
         },
-
-        "CsvToDDBLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Handler": "index.lambda_handler",
-                "Role": {
-                    "Fn::GetAtt": [
-                        "LambdaRole",
-                        "Arn"
-                    ]
-                },
-                "Code": {
-                    "ZipFile": {
-                        "Fn::Join": [
-                            "\n",
-                            {{=require("../tools/jsonutils").formatAsJsonList("./s3ToDynamo.py")}}
-                        ]
-                    }
-                },
-                "Runtime": "python3.7",
-                "Timeout": 900,
-                "MemorySize": 3008,
-                "Environment" : {
-                    "Variables" : {"bucket" : { "Ref" : "BucketName" }, "table" : { "Ref" : "DynamoDBTableName" }}
-                }
-            }
-        },
-
-        "S3Bucket": {
-            "DependsOn" : ["CsvToDDBLambdaFunction","BucketPermission"],
-            "Type": "AWS::S3::Bucket",
-            "Properties": {
-
-                "BucketName": {"Ref" : "BucketName"},
-                "AccessControl": "BucketOwnerFullControl",
-                "NotificationConfiguration":{
-                    "LambdaConfigurations":[
-                        {
-                            "Event":"s3:ObjectCreated:*",
-                            "Function":{
-                                "Fn::GetAtt": [
-                                    "CsvToDDBLambdaFunction",
-                                    "Arn"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        "BucketPermission":{
-            "Type": "AWS::Lambda::Permission",
-            "Properties":{
-                "Action": "lambda:InvokeFunction",
-                "FunctionName":{"Ref" : "CsvToDDBLambdaFunction"},
-                "Principal": "s3.amazonaws.com",
-                "SourceAccount": {"Ref":"AWS::AccountId"}
-            }
+        "Runtime": "python3.7",
+        "Timeout": 900,
+        "MemorySize": 3008,
+        "Environment": {
+          "Variables": {"bucket": { "Ref": "BucketName" }, "table": "VideoParams"}
         }
+      }
     },
-    "Outputs" : {
+    "S3Bucket": {
+      "DependsOn": ["CsvToDDBLambdaFunction","BucketPermission"],
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {"Ref": "BucketName"},
+        "AccessControl": "BucketOwnerFullControl",
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event":"s3:ObjectCreated:*",
+              "Function": {
+                "Fn::GetAtt": [
+                  "CsvToDDBLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BucketPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {"Ref": "CsvToDDBLambdaFunction"},
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {"Ref":"AWS::AccountId"}
+      }
     }
+  },
+  "Outputs": {
+  }
 }

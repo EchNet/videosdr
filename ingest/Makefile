@@ -8,7 +8,7 @@ test:
 	echo "No tests yet"
 
 deploy: check-env build/cloudformation.json
-	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} cloudformation deploy --stack-name csv-to-dynamo1 --template-file ./build/cloudformation.json --capabilities CAPABILITY_IAM --parameter-overrides BucketName=${S3_BUCKET_NAME} DynamoDBTableName=VideoParams
+	aws --profile ${AWS_PROFILE} --region ${AWS_REGION} cloudformation deploy --stack-name csv-to-dynamo1 --template-file ./build/cloudformation.json --capabilities CAPABILITY_IAM --parameter-overrides BucketName=${S3_BUCKET_NAME}
 
 check-env:
 ifndef AWS_PROFILE
