@@ -1,0 +1,249 @@
+{
+  "Description": "Data ingest processes",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters" : {
+    "BucketName": {
+      "Description": "(REQUIRED) Name of the S3 bucket to watch for ",
+      "Type": "String",
+      "ConstraintDescription": "must be a valid bucket name."
+    }
+    "apiGatewayStageName": {
+      "Type": "String",
+      "AllowedPattern": "^[a-z0-9]+$",
+      "Default": "call"
+    },
+    "lambdaFunctionName": {
+      "Type": "String",
+      "AllowedPattern": "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$",
+      "Default": "my-function"
+    }
+  },
+  "Resources": {
+    "videoParamsDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Metadata": {
+        "Comment": "Map contact key to a bag of dynamic properties."
+      },
+      "Properties": {
+        "TableName": "VideoParams",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoParams"
+          }
+        ]
+      }
+    },
+    "videoCampaignsDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "VideoCampaigns",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "name",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "customerKey",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "impossibleProjectId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "impossibleMovieName",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "active",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoCampaigns"
+          }
+        ]
+      }
+    },
+    "videoCustomersDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Metadata": {
+          "Comment": ""
+      },
+      "Properties": {
+        "TableName": "VideoCustomers",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "name",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "impossibleApiKey",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "impossibleApiSecret",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "active",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VideoCustomers"
+          }
+        ]
+      }
+    },
+    "bulkIngestLambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com", "s3.amazonaws.com"]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AWSLambdaInvocation-DynamoDB",
+          "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "policyname",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Resource": "*",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:BatchWriteItem"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "bulkIngestLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "Comment": "Watch an S3 bucket for uploaded CSV files, load each into VideoParams.",
+      },
+      "Properties": {
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [ "LambdaRole", "Arn" ]
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n", {{=require("../tools/jsonutils").formatAsJsonList("./s3ToDynamo.py")}}
+            ]
+          }
+        },
+        "Runtime": "python3.7",
+        "Timeout": 900,
+        "MemorySize": 3008,
+        "Environment": {
+          "Variables": {
+            "bucket": { "Ref": "BucketName" },
+            "table": "VideoParams"
+          }
+        }
+      }
+    },
+    "bulkIngestBucket": {
+      "DependsOn" : ["bulkIngestLambdaFunction", "bulkIngestBucketPermission"],
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": { "Ref" : "BucketName" },
+        "AccessControl": "BucketOwnerFullControl",
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event": "s3:ObjectCreated:*",
+              "Function": {
+                "Fn::GetAtt": [
+                  "CsvToDDBLambdaFunction", "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "bulkIngestBucketPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": { "Ref": "CsvToDDBLambdaFunction" },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": { "Ref": "AWS::AccountId" }
+      }
+    },
+    "apiGateway": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "videosdr-api",
+        "Description": "API"
+      }
+    },
+  },
+  "Outputs" : {
+  }
+}

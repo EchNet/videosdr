@@ -189,12 +189,11 @@
     }
     else {
       // Backward compatibility mode.
-      applyParams({
-        first_name: url.searchParams.get("first_name") || "",
-        company: url.searchParams.get("company") || "",
-        city: url.searchParams.get("city") || "",
-        screenshot: url.searchParams.get("screenshot") || ""
+      var params = {}
+      url.searchParams.forEach(function(value, key) {
+        params[key] = value;
       })
+      applyParams(params)
     }
     // Wipe out query parameters.
     history.replaceState("", "", location.origin + location.pathname);
