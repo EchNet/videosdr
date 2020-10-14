@@ -33,6 +33,7 @@
     projectId: "",
     movieName: "",
     format: "hls",
+    region: null,
     videoElementId: "my-video"
   });
 
@@ -129,6 +130,9 @@
     if (params) {
       // Apply params to video.
       var player = fxplayer(options.videoElementId, {format: options.format});
+      if (options.region) {
+        player.region = options.region;
+      }
       player.projectid = options.projectId;
       player.movie = options.movieName;
       player.params = params;

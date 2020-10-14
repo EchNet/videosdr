@@ -24,6 +24,7 @@ A full list of available query parameters and their values is below.
 |projectId|The ImpossibleFX project ID|ab892-83860a-002788fc|
 |movieName|The ImpossibleFX movie name|OutreachCampaign1|
 |format|The desired video format|hls, dash, mp4|
+|region|The AWS region that the ImpossibleFX assets reside in|us-west-1|
 |videoElementId|The ID of the <video> element in the HTML page.|my-video|
 
 ### 2.  Insert the video content into the body of your webpage.
