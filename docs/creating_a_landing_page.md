@@ -4,19 +4,27 @@
 
 * A webpage editor that allows you to insert custom HTML elements into your page.
 
-* A code snippet provided by VideoSDR.
-
 ## Follow these simple steps. 
 
 ### 1. Insert the code snippet into the header of your webpage
 
-> :warning: If you were not issued a code snippet, please contact VideoSDR before continuing.
-
-Your code snippet will look something like this:
+Your code snippet will be formed something like the following sample:
 
 ```
-<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js?projectId=XXXX&movieName=YYYY"></script>
+<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js?projectId=myproject&movieName=mymovie&format=dash"></script>
 ```
+
+In this sample, `projectId` , `movieName` and `format` are query parameters, and the values of those
+query parameters are `myproject` , `mymovie` and `dash` , respectively.
+
+A full list of available query parameters and their values is below.
+
+| Name | Description | Example |
+| ---- | ----------- | ------- |
+|projectId|The ImpossibleFX project ID|ab892-83860a-002788fc|
+|movieName|The ImpossibleFX movie name|OutreachCampaign1|
+|format|The desired video format|hls, dash, mp4|
+|videoElementId|The ID of the <video> element in the HTML page.|my-video|
 
 ### 2.  Insert the video content into the body of your webpage.
 

@@ -32,6 +32,7 @@
     getVideoParamsUrl: "https://almqm0z6kf.execute-api.us-east-1.amazonaws.com/live/getvideoparams",
     projectId: "",
     movieName: "",
+    format: "hls",
     videoElementId: "my-video"
   });
 
@@ -127,7 +128,7 @@
   function applyParams(params) {
     if (params) {
       // Apply params to video.
-      var player = fxplayer(options.videoElementId, {format: "hls"});
+      var player = fxplayer(options.videoElementId, {format: options.format});
       player.projectid = options.projectId;
       player.movie = options.movieName;
       player.params = params;
