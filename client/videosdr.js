@@ -42,6 +42,7 @@
     throw("videosdr: missing project ID or movieName")
   }
 
+  var params = {};
   var prereqs = {};
 
   // Bring in required Javascripts.
@@ -126,19 +127,27 @@
     return videoControls;
   }
 
-  function applyParams(params) {
-    if (params) {
-      // Apply params to video.
+  function applyParamsToPageText() {
+    forEachElementOfClass("videosdr-when-loaded", function(ele) {
+      visitDescendantTextNodes(ele, function(node) {
+        node.nodeValue = Mustache.render(node.nodeValue, params);
+      })
+      ele.style.visibility = "visible";
+    })
+  }
+
+  function initializeVideo() {
+    var videoElement = document.getElementById(options.videoElementId)
+    if (videoElement) {
       var player = fxplayer(options.videoElementId, {format: options.format});
       if (options.region) {
         player.region = options.region;
       }
       player.projectid = options.projectId;
       player.movie = options.movieName;
-      player.params = params;
+      player.params = params; // Apply params to video.
       player.play();
 
-      var videoElement = document.getElementById(options.videoElementId)
       videoElement.removeAttribute("controls");
       videoElement.parentElement.style.position = "relative";
       videoElement.onclick = function() {
@@ -163,53 +172,31 @@
         videoControls.style.display = "none";
         videoElement.setAttribute("controls", "controls");
       }
-
-      // Apply params to page text.
-      forEachElementOfClass("videosdr-when-loaded", function(ele) {
-        visitDescendantTextNodes(ele, function(node) {
-          node.nodeValue = Mustache.render(node.nodeValue, params);
-        })
-        ele.style.visibility = "visible";
-      })
     }
+    return videoElement;
   }
 
-  // Fetch the personalization parameter values from the data service.
-  function getAndApplyParams() {
-    var url = new URL(window.location.href);
-    var key = url.searchParams.get("key") || localStorage.getItem("key");
-    if (key) {
-      var request = new XMLHttpRequest();
-      request.open("GET", options.getVideoParamsUrl + "?key=" + key);
-      request.send();
-      request.onload = function() {
-        if (request.status == 200) {
-          var data = JSON.parse(request.response);
-          if (data.Items && data.Items.length) {
-            applyParams(data.Items[0]);
-          }
+  // Data and code are ready.  Initialize the video and display custom text.
+  function startUp() {
+    applyParamsToPageText();
+    if (!initializeVideo()) {
+      // If the video is not yet present in the DOM, watch for DOM mutations.
+      new MutationObserver(function(mutList, observer) {
+        if (initializeVideo()) {
+          observer.disconnect();
         }
-      }
-      localStorage.setItem("key", key);
-    }
-    else {
-      // Backward compatibility mode.
-      var params = {}
-      url.searchParams.forEach(function(value, key) {
-        params[key] = value;
+      }).observe(document.getElementsByTagName("body")[0], {
+        childList: true
       })
-      applyParams(params)
     }
-    // Wipe out query parameters.
-    history.replaceState("", "", location.origin + location.pathname);
   }
 
   // Gate startup on required conditions.
   function markPrereq(name) {
     if (!prereqs[name]) {
       prereqs[name] = true;
-      if (prereqs["mustache"] && prereqs["fxplayer"] && prereqs["page"]) {
-        getAndApplyParams()
+      if (prereqs["mustache"] && prereqs["fxplayer"] && prereqs["page"] && prereqs["params"]) {
+        startUp()
       }
     }
   }
@@ -234,6 +221,37 @@
     }
   }
 
+  // Fetch the personalization parameter values from the data service.
+  function whenParamsLoaded(callback) {
+    var url = new URL(window.location.href);
+    var key = url.searchParams.get("key") || localStorage.getItem("key");
+    if (key) {
+      var request = new XMLHttpRequest();
+      request.open("GET", options.getVideoParamsUrl + "?key=" + key);
+      request.send();
+      request.onload = function() {
+        if (request.status == 200) {
+          var data = JSON.parse(request.response);
+          if (data.Items && data.Items.length) {
+            params = data.Items[0];
+            callback();
+          }
+        }
+      }
+      localStorage.setItem("key", key);
+    }
+    else {
+      // Backward compatibility mode.
+      url.searchParams.forEach(function(value, key) {
+        params[key] = value;
+      })
+      callback();
+    }
+    // Wipe out query parameters.
+    history.replaceState("", "", location.origin + location.pathname);
+  }
+
   // Main.
   whenPageLoaded(function() { markPrereq("page") })
+  whenParamsLoaded(function() { markPrereq("params") })
 })();
