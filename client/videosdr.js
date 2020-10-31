@@ -129,6 +129,7 @@
 
   function applyParamsToPageText() {
     forEachElementOfClass("videosdr-when-loaded", function(ele) {
+      console.log('applyParamsToPageText', ele, params)
       visitDescendantTextNodes(ele, function(node) {
         node.nodeValue = Mustache.render(node.nodeValue, params);
       })
@@ -178,16 +179,19 @@
 
   // Data and code are ready.  Initialize the video and display custom text.
   function startUp() {
-    applyParamsToPageText();
     if (!initializeVideo()) {
       // If the video is not yet present in the DOM, watch for DOM mutations.
       new MutationObserver(function(mutList, observer) {
         if (initializeVideo()) {
+          applyParamsToPageText();
           observer.disconnect();
         }
       }).observe(document.getElementsByTagName("body")[0], {
         childList: true
       })
+    }
+    else {
+      applyParamsToPageText();
     }
   }
 
