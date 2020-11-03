@@ -169,7 +169,7 @@
         videoElement.onloadeddata = null;
       }
       videoElement.onplay = function () {
-        videoControls.style.display = "none";
+        videoControls.remove();
         videoElement.setAttribute("controls", "controls");
       }
       if (!videoElement.paused) {
