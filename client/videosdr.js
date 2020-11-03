@@ -129,7 +129,6 @@
 
   function applyParamsToPageText() {
     forEachElementOfClass("videosdr-when-loaded", function(ele) {
-      console.log('applyParamsToPageText', ele, params)
       visitDescendantTextNodes(ele, function(node) {
         node.nodeValue = Mustache.render(node.nodeValue, params);
       })
@@ -172,6 +171,9 @@
       videoElement.onplay = function () {
         videoControls.style.display = "none";
         videoElement.setAttribute("controls", "controls");
+      }
+      if (!videoElement.paused) {
+        videoElement.onplay()
       }
     }
     return videoElement;
