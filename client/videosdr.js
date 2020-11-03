@@ -150,8 +150,9 @@
 
       videoElement.removeAttribute("controls");
       videoElement.parentElement.style.position = "relative";
-      videoElement.onclick = function() {
-        videoElement.paused && videoElement.play();
+      videoElement.onclick = function(event) {
+        event.preventDefault()
+        videoElement.paused ? videoElement.play() : videoElement.pause();
       }
 
       var videoControls = createBigPlayButton();
