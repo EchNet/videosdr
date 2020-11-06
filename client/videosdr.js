@@ -42,7 +42,6 @@
     throw("videosdr: missing project ID or movieName")
   }
 
-  var params = {};
   var prereqs = {};
 
   // Bring in required Javascripts.
@@ -127,7 +126,7 @@
     return videoControls;
   }
 
-  function applyParamsToPageText() {
+  function applyParamsToPageText(params) {
     forEachElementOfClass("videosdr-when-loaded", function(ele) {
       visitDescendantTextNodes(ele, function(node) {
         node.nodeValue = Mustache.render(node.nodeValue, params);
@@ -136,7 +135,7 @@
     })
   }
 
-  function initializeVideo() {
+  function initializeVideo(params) {
     var videoElement = document.getElementById(options.videoElementId)
     if (videoElement) {
       var player = fxplayer(options.videoElementId, {format: options.format});
@@ -181,12 +180,12 @@
   }
 
   // Data and code are ready.  Initialize the video and display custom text.
-  function startUp() {
-    if (!initializeVideo()) {
+  function startUp(params) {
+    if (!initializeVideo(params)) {
       // If the video is not yet present in the DOM, watch for DOM mutations.
       new MutationObserver(function(mutList, observer) {
-        if (initializeVideo()) {
-          applyParamsToPageText();
+        if (initializeVideo(params)) {
+          applyParamsToPageText(params);
           observer.disconnect();
         }
       }).observe(document.getElementsByTagName("body")[0], {
@@ -194,16 +193,16 @@
       })
     }
     else {
-      applyParamsToPageText();
+      applyParamsToPageText(params);
     }
   }
 
   // Gate startup on required conditions.
-  function markPrereq(name) {
+  function markPrereq(name, value) {
     if (!prereqs[name]) {
-      prereqs[name] = true;
+      prereqs[name] = value || 1;
       if (prereqs["mustache"] && prereqs["fxplayer"] && prereqs["page"] && prereqs["params"]) {
-        startUp()
+        startUp(prereqs["params"])
       }
     }
   }
@@ -228,10 +227,56 @@
     }
   }
 
-  // Fetch the personalization parameter values from the data service.
-  function whenParamsLoaded(callback) {
+  function hasLocalStorage() {
+    try {
+      localStorage.setItem("$test", "$test")
+      localStorage.removeItem("$test")
+      return true;
+    }
+    catch (e) {
+    }
+  }
+
+  function clearLocalStorage() {
+    for (var k in localStorage) {
+      localStorage.removeItem(k)
+    }
+  }
+
+  function getQueryParams() {
     var url = new URL(window.location.href);
-    var key = url.searchParams.get("key") || localStorage.getItem("key");
+    var queryParams = {}
+    url.searchParams.forEach(function(value, key) {
+      queryParams[key] = value;
+    })
+    return queryParams;
+  }
+
+  // Fetch the personalization parameter values from the data service, then
+  // continue by calling callback, passing a hash of parameters.
+  function whenParamsLoaded(callback) {
+    //
+    // Query string modes
+    // 
+    // Parameter values in query string
+    // Query string example: ?name=Hal&company=HalCo
+    // Query string is cleared, parameters are saved in localstorage.
+    // 
+    // Parameter values through key-value lookup
+    // Query string example: ?key=A1B2C3
+    // Query string is cleared, key is saved in localstorage.
+    // 
+    // Parameter values through key-value lookup, no save.
+    // Query string example: ?k=A1B2C3
+    // Query string is not cleared, localstorage is cleared.
+    //
+    // Use last parameters
+    // Query string is empty.
+    //
+    var queryParams = getQueryParams()
+    var hasLocal = hasLocalStorage()
+
+    var key = queryParams["key"] || queryParams["k"] || (hasLocal && localStorage.getItem("key"))
     if (key) {
       var request = new XMLHttpRequest();
       request.open("GET", options.getVideoParamsUrl + "?key=" + key);
@@ -240,25 +285,35 @@
         if (request.status == 200) {
           var data = JSON.parse(request.response);
           if (data.Items && data.Items.length) {
-            params = data.Items[0];
-            callback();
+            finish(data.Items[0]);
           }
         }
       }
-      localStorage.setItem("key", key);
     }
     else {
-      // Backward compatibility mode.
-      url.searchParams.forEach(function(value, key) {
-        params[key] = value;
-      })
-      callback();
+      finish({});
     }
-    // Wipe out query parameters.
-    history.replaceState("", "", location.origin + location.pathname);
+
+    if (hasLocal) {
+      if (queryParams["k"]) {
+        clearLocalStorage()
+      }
+      else {
+        // Hide query parameters from address bar.
+        history.replaceState("", "", location.origin + location.pathname);
+        for (var k in queryParams) {
+          localStorage.setItem(k, queryParams[k]);
+        }
+      }
+    }
+
+    function finish(kvParams) {
+      // URL query string parameters override keyed values.
+      callback(Object.assign({}, hasLocal && localStorage, kvParams, queryParams));
+    }
   }
 
   // Main.
   whenPageLoaded(function() { markPrereq("page") })
-  whenParamsLoaded(function() { markPrereq("params") })
+  whenParamsLoaded(function(params) { markPrereq("params", params) })
 })();
