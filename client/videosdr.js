@@ -169,14 +169,20 @@
         videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
         videoElement.onloadeddata = null;
       }
-      videoElement.onplay = function () {
+
+      videoElement.onerror = function() {
+        videoElement.removeAttribute("poster");
+        console.log("video error", videoElement.error.code, videoElement.error.message)
+      }
+
+      var onplay = function() {
         // Video has started to play.  Hide the big play button and enable default controls.
         bigPlayButtonControl.remove();
         videoElement.setAttribute("controls", "controls");
       }
-      if (!videoElement.paused) {
-        videoElement.onplay()
-      }
+      videoElement.onplay = onplay;
+
+      !videoElement.paused && onplay();  // Handle autoplay.
     }
     return videoElement;
   }
