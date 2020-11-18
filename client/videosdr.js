@@ -90,22 +90,22 @@
   function createBigPlayButton() {
     var SIZE = 1024;
 
-    var videoControls = document.createElement("div");
-    videoControls.style.display = "none";
-    videoControls.style.position = "absolute";
-    videoControls.style.width = "80px";
-    videoControls.style.height = "80px";
-    videoControls.style.borderRadius = "50%";
-    videoControls.style.top = "50%";
-    videoControls.style.left = "50%";
-    videoControls.style.background = "#555";
-    videoControls.style.transform = "translate(-50%, -50%)";
-    videoControls.style.transition = "0.2s";
-    videoControls.onmouseover = function() {
-      videoControls.style.background = "#777";
+    var container = document.createElement("div");
+    container.style.display = "none";
+    container.style.position = "absolute";
+    container.style.width = "100px";
+    container.style.height = "100px";
+    container.style.borderRadius = "50%";
+    container.style.top = "50%";
+    container.style.left = "50%";
+    container.style.background = "#555";
+    container.style.transform = "translate(-50%, -50%)";
+    container.style.transition = "0.2s";
+    container.onmouseover = function() {
+      container.style.background = "#777";
     }
-    videoControls.onmouseleave = function() {
-      videoControls.style.background = "#555";
+    container.onmouseleave = function() {
+      container.style.background = "#555";
     }
 
     var arrow = document.createElement("canvas");
@@ -122,8 +122,8 @@
     context.fillStyle = "white";
     context.fill();
 
-    videoControls.appendChild(arrow);
-    return videoControls;
+    container.appendChild(arrow);
+    return container;
   }
 
   function applyParamsToPageText(params) {
@@ -149,27 +149,29 @@
 
       videoElement.removeAttribute("controls");
       videoElement.parentElement.style.position = "relative";
-      videoElement.onclick = function(event) {
-        event.preventDefault()
-        videoElement.paused ? videoElement.play() : videoElement.pause();
-      }
 
-      var videoControls = createBigPlayButton();
-      videoElement.after(videoControls);
-      videoControls.onclick = function() {
+      var bigPlayButtonControl = createBigPlayButton();
+      videoElement.after(bigPlayButtonControl);
+      bigPlayButtonControl.addEventListener("click", function() {
         videoElement.paused && videoElement.play();
-      }
+      })
 
       videoElement.onloadeddata = function() {
-        // First frame is now available.  Remove placeholder image.
+        // First frame is now available.  Remove placeholder image and show the big play button.
         videoElement.removeAttribute("poster");
-        videoControls.style.display = "block";
+        bigPlayButtonControl.style.display = "block";
+        // Now enable click to play on the video itself.
+        videoElement.addEventListener("click", function(event) {
+          event.preventDefault()
+          videoElement.paused ? videoElement.play() : videoElement.pause();
+        });
         // This hack is necessary for Safari, which does not automatically increase height.
         videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
         videoElement.onloadeddata = null;
       }
       videoElement.onplay = function () {
-        videoControls.remove();
+        // Video has started to play.  Hide the big play button and enable default controls.
+        bigPlayButtonControl.remove();
         videoElement.setAttribute("controls", "controls");
       }
       if (!videoElement.paused) {
