@@ -102,7 +102,7 @@
     container.style.transform = "translate(-50%, -50%)";
     container.style.transition = "0.2s";
     container.onmouseover = function() {
-      container.style.background = "#777";
+      container.style.background = "#888";
     }
     container.onmouseleave = function() {
       container.style.background = "#555";
@@ -159,23 +159,43 @@
       player.play();
 
       videoElement.removeAttribute("controls");
+      videoElement.removeAttribute("autoplay");
       videoElement.parentElement.style.position = "relative";
 
       var bigPlayButtonControl = createBigPlayButton();
+      var wePlayed = false;
       videoElement.after(bigPlayButtonControl);
       bigPlayButtonControl.addEventListener("click", function() {
-        videoElement.paused && videoElement.play();
+        if (videoElement.paused) {
+          wePlayed = true;
+          videoElement.play();
+        }
       })
 
       videoElement.onloadeddata = function() {
         // First frame is now available.  Remove placeholder image and show the big play button.
         videoElement.removeAttribute("poster");
         bigPlayButtonControl.style.display = "block";
-        // Now enable click to play on the video itself.
+        // Enable click-to-play on the video itself.
+        var wasPaused;
+        videoElement.addEventListener("click", function(event) {
+          // Detect play/pause state of the video in the capture phase, in case the
+          // event bubbles up from a play button control.
+          wasPaused = videoElement.paused;
+        }, true);
         videoElement.addEventListener("click", function(event) {
           event.preventDefault()
-          videoElement.paused ? videoElement.play() : videoElement.pause();
+          if (!wasPaused == !videoElement.paused) {
+            if (videoElement.paused) {
+              wePlayed = true;
+              videoElement.play();
+            }
+            else {
+              videoElement.pause();
+            }
+          }
         });
+
         // This hack is necessary for Safari, which does not automatically increase height.
         videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
         videoElement.onloadeddata = null;
@@ -186,14 +206,15 @@
         console.log("video error", videoElement.error.code, videoElement.error.message)
       }
 
-      var onplay = function() {
-        // Video has started to play.  Hide the big play button and enable default controls.
-        bigPlayButtonControl.remove();
-        videoElement.setAttribute("controls", "controls");
+      videoElement.onplay = function() {
+        if (wePlayed) {  // Ignore false play events from autoplay on Safari.
+          // Video has started to play.  Hide the big play button and enable default controls.
+          bigPlayButtonControl.remove();
+          videoElement.setAttribute("controls", "controls");
+        }
       }
-      videoElement.onplay = onplay;
 
-      !videoElement.paused && onplay();  // Handle autoplay.
+      !videoElement.paused && videoElement.pause();  // Deny autoplay.
     }
     return videoElement;
   }
