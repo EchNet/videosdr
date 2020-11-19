@@ -135,10 +135,21 @@
     })
   }
 
+  // Get the specified video format.  Supported values: "hls", "dash", "mp4".
+  function getFormat() {
+    var format = options.format;
+    var userAgent = navigator.userAgent;
+    // Dash is not supported on iOS Chrome.  Fall back on hls.
+    if (/CriOS/i.test(userAgent) && /iphone|ipod|ipad/i.test(userAgent) && /^dash$/i.test(format)) {
+      format = "hls";
+    }
+    return format;
+  }
+
   function initializeVideo(params) {
     var videoElement = document.getElementById(options.videoElementId)
     if (videoElement) {
-      var player = fxplayer(options.videoElementId, {format: options.format});
+      var player = fxplayer(options.videoElementId, {format: getFormat()});
       if (options.region) {
         player.region = options.region;
       }
