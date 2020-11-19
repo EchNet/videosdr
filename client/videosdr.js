@@ -32,7 +32,7 @@
     getVideoParamsUrl: "https://almqm0z6kf.execute-api.us-east-1.amazonaws.com/live/getvideoparams",
     projectId: "",
     movieName: "",
-    format: "hls",
+    format: "dash",
     region: null,
     videoElementId: "my-video"
   });
