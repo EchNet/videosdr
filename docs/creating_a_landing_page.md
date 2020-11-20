@@ -11,11 +11,11 @@
 Your code snippet will be formed something like the following sample:
 
 ```
-<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js?projectId=myproject&movieName=mymovie&format=dash"></script>
+<script src="https://s3.amazonaws.com/code.videosdr.com/videosdr-min.js?projectId=myproject&movieName=mymovie&format=mp4"></script>
 ```
 
 In this sample, `projectId` , `movieName` and `format` are query parameters, and the values of those
-query parameters are `myproject` , `mymovie` and `dash` , respectively.
+query parameters are `myproject` , `mymovie` and `mp4` , respectively.
 
 A full list of available query parameters and their values is below.
 
@@ -23,9 +23,12 @@ A full list of available query parameters and their values is below.
 | ---- | ----------- | ------- |
 |projectId|The ImpossibleFX project ID|ab892-83860a-002788fc|
 |movieName|The ImpossibleFX movie name|OutreachCampaign1|
-|format|The desired video format|hls, dash, mp4|
+|format|The desired video format|hls, dash (the default), mp4|
 |region|The AWS region that the ImpossibleFX assets reside in|us-west-1|
 |videoElementId|The ID of the <video> element in the HTML page.|my-video|
+
+Note: dash format is not supported by the Chrome browser on iOS devices.  If this combination
+is selected, hls format is used instead.
 
 ### 2.  Insert the video content into the body of your webpage.
 
