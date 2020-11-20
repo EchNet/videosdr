@@ -149,74 +149,71 @@
   function initializeVideo(params) {
     var videoElement = document.getElementById(options.videoElementId)
     if (videoElement) {
-      var player = fxplayer(options.videoElementId, {format: getFormat()});
-      if (options.region) {
-        player.region = options.region;
-      }
-      player.projectid = options.projectId;
-      player.movie = options.movieName;
-      player.params = params; // Apply params to video.
-      player.play();
-
-      videoElement.removeAttribute("controls");
-      videoElement.removeAttribute("autoplay");
-      videoElement.parentElement.style.position = "relative";
-
-      var bigPlayButtonControl = createBigPlayButton();
-      var wePlayed = false;
-      videoElement.after(bigPlayButtonControl);
-      bigPlayButtonControl.addEventListener("click", function() {
-        if (videoElement.paused) {
-          wePlayed = true;
-          videoElement.play();
-        }
-      })
-
-      videoElement.onloadeddata = function() {
-        // First frame is now available.  Remove placeholder image and show the big play button.
-        videoElement.removeAttribute("poster");
-        bigPlayButtonControl.style.display = "block";
-        // Enable click-to-play on the video itself.
-        var wasPaused;
-        videoElement.addEventListener("click", function(event) {
-          // Detect play/pause state of the video in the capture phase, in case the
-          // event bubbles up from a play button control.
-          wasPaused = videoElement.paused;
-        }, true);
-        videoElement.addEventListener("click", function(event) {
-          event.preventDefault()
-          if (!wasPaused == !videoElement.paused) {
-            if (videoElement.paused) {
-              wePlayed = true;
-              videoElement.play();
-            }
-            else {
-              videoElement.pause();
-            }
-          }
-        });
-
-        // This hack is necessary for Safari, which does not automatically increase height.
-        videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
-        videoElement.onloadeddata = null;
-      }
-
-      videoElement.onerror = function() {
-        videoElement.removeAttribute("poster");
-        console.log("video error", videoElement.error.code, videoElement.error.message)
-      }
-
-      videoElement.onplay = function() {
-        if (wePlayed) {  // Ignore false play events from autoplay on Safari.
-          // Video has started to play.  Hide the big play button and enable default controls.
-          bigPlayButtonControl.remove();
-          videoElement.setAttribute("controls", "controls");
-        }
-      }
-
-      !videoElement.paused && videoElement.pause();  // Deny autoplay.
+      initializeVideoElement(videoElement, params)
     }
     return videoElement;
+  }
+
+  function initializeVideoElement(videoElement, params) {
+    videoElement.parentElement.style.position = "relative";
+
+    var player = fxplayer(videoElement, {format: getFormat()});
+    if (options.region) {
+      player.region = options.region;
+    }
+    player.projectid = options.projectId;
+    player.movie = options.movieName;
+    player.params = params; // Apply params to video.
+    player.play();
+
+    videoElement.removeAttribute("controls");
+    videoElement.removeAttribute("autoplay");
+
+    var bigPlayButtonControl = createBigPlayButton();
+    videoElement.after(bigPlayButtonControl);
+    bigPlayButtonControl.addEventListener("click", function() {
+      if (videoElement.paused) {
+        videoElement.play();
+      }
+    })
+
+    videoElement.onloadeddata = function() {
+      // First frame is now available.  Remove placeholder image and show the big play button.
+      videoElement.removeAttribute("poster");
+      bigPlayButtonControl.style.display = "block";
+      // Enable click-to-play on the video itself.
+      var wasPaused;
+      videoElement.addEventListener("click", function(event) {
+        // Detect play/pause state of the video in the capture phase, in case the
+        // event bubbles up from a play button control.
+        wasPaused = videoElement.paused;
+      }, true);
+      videoElement.addEventListener("click", function(event) {
+        event.preventDefault()
+        if (!wasPaused == !videoElement.paused) {
+          videoElement.paused ? videoElement.play() : videoElement.pause();
+        }
+      });
+
+      // This hack is necessary for Safari, which does not automatically increase height.
+      videoElement.style.minHeight = (videoElement.clientWidth * videoElement.videoHeight / videoElement.videoWidth) + "px";
+      videoElement.onloadeddata = null;
+    }
+
+    videoElement.onerror = function() {
+      videoElement.removeAttribute("poster");
+      console.log("video error", videoElement.error.code, videoElement.error.message)
+    }
+
+    videoElement.onplaying = function() {
+      if (!videoElement.paused) {  // Ignore false play events from autoplay on Safari.
+        // Video has started to play.  Hide the big play button and enable default controls.
+        bigPlayButtonControl.remove();
+        videoElement.setAttribute("controls", "controls");
+      }
+    }
+
+    videoElement.pause();  // Deny autoplay.
   }
 
   // Data and code are ready.  Initialize the video and display custom text.
