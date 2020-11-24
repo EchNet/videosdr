@@ -1,4 +1,6 @@
 (function() {
+  var BUST_CACHE = true;
+  var userAgent = navigator.userAgent;
 
   // Hide template text.
   (function() {
@@ -29,43 +31,55 @@
     }
     return options;
   })({
+    // Default options.
     getVideoParamsUrl: "https://almqm0z6kf.execute-api.us-east-1.amazonaws.com/live/getvideoparams",
     projectId: "",
     movieName: "",
     format: "dash",
     region: null,
+    salt: "",
     videoElementId: "my-video"
   });
 
-  // Check for required options AFTER hiding template text.
-  if (!options.projectId || !options.movieName) {
-    throw("videosdr: missing project ID or movieName")
-  }
-
   var prereqs = {};
 
-  // Bring in required Javascripts.
-  (function(scripts) {
-    for (var i in scripts) {
-      (function(ss) {
-        var script = document.createElement("script");
-        script.src = ss.src;
-        script.addEventListener("load", function() {
-          markPrereq(ss.name);
-        });
-        document.head.appendChild(script)
-      })(scripts[i])
+  function init() {
+    // Check for required options AFTER hiding template text.
+    if (!options.projectId || !options.movieName) {
+      throw("videosdr: missing project ID or movieName")
     }
-  })([
-    {
-      name: "mustache",
-      src: "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"
-    },
-    {
-      name: "fxplayer",
-      src: "https://cdn.impossible.io/support/fxplayer.js"
+
+    if (BUST_CACHE && !options["salt"]) {
+      var script = document.createElement("script");
+      script.src = currentScript.src + "&salt=" + Math.random().toString(36).substring(2, 15);
+      document.head.appendChild(script)
+      throw("videosdr: cache bust")
     }
-  ])
+    const queryVars = currentScript.src.replace(/^[^\?]+\??/, "").split("&");
+
+    // Bring in required Javascripts.
+    (function(scripts) {
+      for (var i in scripts) {
+        (function(ss) {
+          var script = document.createElement("script");
+          script.src = ss.src;
+          script.addEventListener("load", function() {
+            markPrereq(ss.name);
+          });
+          document.head.appendChild(script)
+        })(scripts[i])
+      }
+    })([
+      {
+        name: "mustache",
+        src: "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"
+      },
+      {
+        name: "fxplayer",
+        src: "https://cdn.impossible.io/support/fxplayer.js"
+      }
+    ])
+  }
 
   // DOM utility.
   function forEachElementOfClass(className, func) {
@@ -135,12 +149,19 @@
     })
   }
 
+  function isIOS() {
+    return !!/iphone|ipod|ipad/i.test(userAgent)
+  }
+
+  function isChromeOnIOS() {
+    return isIOS() && !!/CriOS/i.test(userAgent);
+  }
+
   // Get the specified video format.  Supported values: "hls", "dash", "mp4".
   function getFormat() {
     var format = options.format;
-    var userAgent = navigator.userAgent;
     // Dash is not supported on iOS Chrome.  Fall back on hls.
-    if (/CriOS/i.test(userAgent) && /iphone|ipod|ipad/i.test(userAgent) && /^dash$/i.test(format)) {
+    if (isChromeOnIOS() && /^dash$/i.test(format)) {
       format = "hls";
     }
     return format;
@@ -167,14 +188,11 @@
     player.play();
 
     videoElement.removeAttribute("controls");
-    videoElement.removeAttribute("autoplay");
 
     var bigPlayButtonControl = createBigPlayButton();
     videoElement.after(bigPlayButtonControl);
     bigPlayButtonControl.addEventListener("click", function() {
-      if (videoElement.paused) {
-        videoElement.play();
-      }
+      videoElement.play();
     })
 
     videoElement.onloadeddata = function() {
@@ -185,7 +203,7 @@
       var wasPaused;
       videoElement.addEventListener("click", function(event) {
         // Detect play/pause state of the video in the capture phase, in case the
-        // event bubbles up from a play button control.
+        // event bubbles up from a play button control (Safari).
         wasPaused = videoElement.paused;
       }, true);
       videoElement.addEventListener("click", function(event) {
@@ -206,11 +224,14 @@
     }
 
     videoElement.onplaying = function() {
-      if (!videoElement.paused) {  // Ignore false play events from autoplay on Safari.
+      if (!videoElement.paused) {  // Ignore false play events from auto-autoplay on Safari.
         // Video has started to play.  Hide the big play button and enable default controls.
         bigPlayButtonControl.remove();
         videoElement.setAttribute("controls", "controls");
       }
+      videoElement.addEventListener("touchstart", function(event) {
+        event.preventDefault();  // Suppress mouse click emulation.
+      });
     }
 
     videoElement.pause();  // Deny autoplay.
@@ -351,6 +372,7 @@
   }
 
   // Main.
+  init();
   whenPageLoaded(function() { markPrereq("page") })
   whenParamsLoaded(function(params) { markPrereq("params", params) })
 })();
