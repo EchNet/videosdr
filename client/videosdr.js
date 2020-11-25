@@ -19,11 +19,10 @@
   const options = (function(defaultOptions) {
     const queryVars = currentScript.src.replace(/^[^\?]+\??/, "").split("&");
     const queryStringOptions = {};
-    for (var i in queryVars) {
+    for (var i = 0; i < queryVars.length; ++i) {
       const pair = queryVars[i].split("=");
       queryStringOptions[pair[0]] = decodeURI(pair[1]).replace(/\+/g, ' ');
     }
-
     const options = {};
     for (var key in defaultOptions) {
       options[key] = currentScript.getAttribute("data-" + key)
@@ -58,7 +57,7 @@
 
     // Bring in required Javascripts.
     (function(scripts) {
-      for (var i in scripts) {
+      for (var i = 0; i < scripts.length; ++i) {
         (function(ss) {
           var script = document.createElement("script");
           script.src = ss.src;
