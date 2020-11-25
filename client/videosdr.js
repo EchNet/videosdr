@@ -55,7 +55,6 @@
       document.head.appendChild(script)
       throw("videosdr: cache bust")
     }
-    const queryVars = currentScript.src.replace(/^[^\?]+\??/, "").split("&");
 
     // Bring in required Javascripts.
     (function(scripts) {
