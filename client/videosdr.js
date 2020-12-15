@@ -151,15 +151,16 @@
     return !!/iphone|ipod|ipad/i.test(userAgent)
   }
 
-  function isChromeOnIOS() {
-    return isIOS() && !!/CriOS/i.test(userAgent);
+  // Assume that dash format is not supported on all iOS devices.
+  function isDashSupported() {
+    return !isIOS();
   }
 
   // Get the specified video format.  Supported values: "hls", "dash", "mp4".
   function getFormat() {
     var format = options.format;
     // Dash is not supported on iOS Chrome.  Fall back on hls.
-    if (isChromeOnIOS() && /^dash$/i.test(format)) {
+    if (!isDashSupported() && /^dash$/i.test(format)) {
       format = "hls";
     }
     return format;
