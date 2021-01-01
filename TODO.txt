@@ -1,3 +1,25 @@
-I propose making some improvements to the upload:
-1. Whenever you upload data, you get a report in your email, including the number of records created and any errors that occurred.
-2. The ingest script ignores duplicate keys, but lists them in the email report.
+
+POPUP
+-----
+
+Create skeleton / build / test case.
+
+Port startup logic
+
+Implement iframe container.
+
+Design/Implement customization mechanism.
+
+Create public case / chrome extension.
+
+
+OVERLAY
+-------
+
+Create skeleton / test case.
+
+Port startup logic
+
+Implement button element / styling / customization.
+
+Add to public case.
