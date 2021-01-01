@@ -176,6 +176,8 @@
 
   function initializeVideoElement(videoElement, params) {
     videoElement.parentElement.style.position = "relative";
+    videoElement.removeAttribute("controls");
+    videoElement.autoplay = true;
 
     var player = fxplayer(videoElement, {format: getFormat()});
     if (options.region) {
@@ -185,8 +187,6 @@
     player.movie = options.movieName;
     player.params = params; // Apply params to video.
     player.play();
-
-    videoElement.removeAttribute("controls");
 
     var bigPlayButtonControl = createBigPlayButton();
     videoElement.after(bigPlayButtonControl);
