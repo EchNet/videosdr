@@ -2,8 +2,6 @@
 POPUP
 -----
 
-Create skeleton / build / test case.
-
 Port startup logic
 
 Implement iframe container.

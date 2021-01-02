@@ -1,19 +1,21 @@
-build: build/videosdr-min.js
+minified: build/videosdr-min.js build/optin-min.js
 
-build/videosdr-min.js: videosdr.js
-	mkdir -p build
+build/videosdr-min.js: build videosdr.js
 	../node_modules/.bin/minify videosdr.js > build/videosdr-min.js
 
-test:
-	echo "No tests yet"
+build/optin-min.js: build optin.js
+	../node_modules/.bin/minify optin.js > build/optin-min.js
 
-deploy: check-env build/videosdr-min.js
-	aws s3 --profile ${AWS_PROFILE} cp build/videosdr-min.js s3://${CODE_BUCKET_NAME}
+deploy: check-aws-env minified
+	aws s3 --profile ${AWS_PROFILE} sync ./build s3://${CODE_BUCKET_NAME} --exclude minifier.output
+
+build:
+	mkdir -p build
 
 clean:
 	rm -rf build
 
-check-env:
+check-aws-env:
 ifndef AWS_PROFILE
 	$(error AWS_PROFILE is undefined)
 endif
