@@ -2,9 +2,12 @@
 POPUP
 -----
 
-Port startup logic
-
 Implement iframe container.
+  - Append HTML to body.
+  - Append stylesheet to head.
+
+Add event handlers to a href="#pattern"
+  - Put specific CSS class on body.  (That makes the thingy visible.)
 
 Design/Implement customization mechanism.
 
