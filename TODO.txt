@@ -1,26 +1,13 @@
+Style the popup container.
 
-POPUP
------
+Write the hoverbutton macros.
 
-Implement iframe container.
-  - Append HTML to body.
-  - Append stylesheet to head.
+Style the hoverbutton container.
 
-Add event handlers to a href="#pattern"
-  - Put specific CSS class on body.  (That makes the thingy visible.)
+Design/Implement customization mechanism for business owner.
 
-Design/Implement customization mechanism.
+Implement customization runtime.
 
-Create public case / chrome extension.
+Deploy.
 
-
-OVERLAY
--------
-
-Create skeleton / test case.
-
-Port startup logic
-
-Implement button element / styling / customization.
-
-Add to public case.
+Create public demo.

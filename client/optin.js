@@ -52,20 +52,42 @@
             "height: 100%;", 
             "background: rgba(192,192,192,0.5);", 
             "z-index: 2000000;",
-          "}"
-        ].join("\n")
-      },
-      {
-        "code": "appendStyle",
-        "style": [
+          "}",
           "div.optin-modal-frame {",
-            "position: fixed;",
+            "position: relative;",
             "width: 100%;",
             "max-width: 480px;",
-            "max-height: 360px;", 
+            "min-height: 300px;",
+            "top: 50%;",
+            "padding: 3px;",
+            "text-align: center;",
             "margin: auto;",
+            "margin-top: -150px;",
+            "border: solid 2px white;",
             "background: white;",
             "z-index: 2000001;",
+          "}",
+          "div.optin-modal-content {",
+            "font-family: \"Helvetica Neue\",Helvetica,Arial,sans-serif;",
+            "font-size: 12px;",
+          "}",
+          "button.optin-close-button {",
+            "padding: 0 3px 0 4px;",
+            "display: block;",
+            "font-size: 20px;",
+            "line-height: 20px;",
+            "position: absolute;",
+            "top: -11px;",
+            "right: -9px;",
+            "z-index: 2000002;",
+            "color: white;",
+            "text-align: center;",
+            "text-decoration: none;",
+            "vertical-align: baseline;",
+            "cursor: pointer;",
+            "background: black;",
+            "border: solid 2px white;",
+            "border-radius: 22px;",
           "}"
         ].join("\n")
       },
@@ -94,7 +116,7 @@
       createPopup(instruction.name, instruction.html)
     },
     handleClick: function(instruction) {
-      handleClick(instruction.target, instruction.action)
+      handleClick(instruction.selector, instruction.action)
     }
   }
 
@@ -128,34 +150,32 @@
     executeInstruction([
       {
         "code": "appendHtml",
-        "html": "<div class='optin-modal-element optin-modal-screen " + name + "'></div>"
-      },
-      {
-        "code": "appendHtml",
         "html": [
-          "<div class='optin-modal-element optin-modal-frame " + name + "'>",
-            "<div class='optin-close-container'>",
-              "<button>X</button>",
+          "<div class='optin-modal-screen optin-modal-screen-" + name + " optin-modal-root-" + name + "'>",
+            "<div class='optin-modal-frame " + name + "'>",
+              "<button class='optin-close-button'>×</button>",
+              "<div class='optin-modal-content optin-modal-content-" + name + "'>",
+              "</div>",
             "</div>",
           "</div>"
         ].join("")
       },
       {
         "code": "appendHtml",
-        "selector": "div.optin-modal-frame",
+        "selector": "div.optin-modal-content-" + name,
         "html": html
       },
       {
         "code": "appendStyle",
         "style": [
-          "body:not(." + name + "-shown) .optin-modal-element." + name + " {",
+          "body:not(." + name + "-shown) .optin-modal-root-" + name + " {",
             "display: none;",
           "}"
         ].join(" ")
       },
       {
         "code": "handleClick",
-        "target": "a[href='#" + name + "']",
+        "selector": "a[href='#" + name + "']",
         "action": {
           "code": "addClass",
           "class": name + "-shown"
@@ -163,7 +183,7 @@
       },
       {
         "code": "handleClick",
-        "target": "div.optin-modal-screen." + name,
+        "selector": "div.optin-modal-screen-" + name,
         "action": {
           "code": "removeClass",
           "class": name + "-shown"
@@ -171,7 +191,7 @@
       },
       {
         "code": "handleClick",
-        "target": "div.optin-modal-frame." + name + " div.optin-close-container", 
+        "selector": "div.optin-modal-frame." + name + " div.optin-close-container", 
         "action": {
           "code": "removeClass",
           "class": name + "-shown"
@@ -187,8 +207,8 @@
     head.appendChild(styles);
   }
 
-  function handleClick(target, action) {
-    var links = document.querySelectorAll(target);
+  function handleClick(selector, action) {
+    var links = document.querySelectorAll(selector);
     for (var i = 0; i < links.length; ++i) {
       links[i].addEventListener("click", function(e) {
         e.preventDefault();
