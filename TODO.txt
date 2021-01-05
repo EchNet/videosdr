@@ -1,12 +1,6 @@
-Style the popup container.
-
 Write the hoverbutton macros.
 
 Style the hoverbutton container.
-
-Design/Implement customization mechanism for business owner.
-
-Implement customization runtime.
 
 Deploy.
 

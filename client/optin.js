@@ -17,113 +17,79 @@
     }
   }
 
-  // Get options.
-  const options = (function(defaultOptions) {
-    const queryVars = currentScript.src.replace(/^[^\?]+\??/, "").split("&");
-    const queryStringOptions = {};
-    queryVars.forEach(function(qv) {
-      const pair = qv.split("=");
-      queryStringOptions[pair[0]] = decodeURI(pair[1]).replace(/\+/g, ' ');
-    })
-    const options = {};
-    for (var key in defaultOptions) {
-      options[key] = currentScript.getAttribute("data-" + key)
-          || queryStringOptions[key] || defaultOptions[key];
-    }
-    return options;
-  })({
-    // Default options.
-    salt: ""
-  });
+  // Capture the source URL immediately.
+  const src = currentScript.src;
 
-  function isIOS() {
-    return !!/iphone|ipod|ipad/i.test(userAgent) }
+  function getRelativeUrl(filePath) {
+    const baseSrc = src.match(/^[^\?]+/)[0];
+    const path = baseSrc.split("/");
+    path.pop()
+    path.push(filePath)
+    return path.join("/");
+  }
 
-  function initialize() {
-    executeInstruction([
-      {
-        "code": "appendStyle",
-        "style": [
-          "div.optin-modal-screen {",
-            "position: fixed;",
-            "top: 0;",
-            "left: 0;", 
-            "width: 100%;", 
-            "height: 100%;", 
-            "background: rgba(192,192,192,0.5);", 
-            "z-index: 2000000;",
-          "}",
-          "div.optin-modal-frame {",
-            "position: relative;",
-            "width: 100%;",
-            "max-width: 480px;",
-            "min-height: 300px;",
-            "top: 50%;",
-            "padding: 3px;",
-            "text-align: center;",
-            "margin: auto;",
-            "margin-top: -150px;",
-            "border: solid 2px white;",
-            "background: white;",
-            "z-index: 2000001;",
-          "}",
-          "div.optin-modal-content {",
-            "font-family: \"Helvetica Neue\",Helvetica,Arial,sans-serif;",
-            "font-size: 12px;",
-          "}",
-          "button.optin-close-button {",
-            "padding: 0 3px 0 4px;",
-            "display: block;",
-            "font-size: 20px;",
-            "line-height: 20px;",
-            "position: absolute;",
-            "top: -11px;",
-            "right: -9px;",
-            "z-index: 2000002;",
-            "color: white;",
-            "text-align: center;",
-            "text-decoration: none;",
-            "vertical-align: baseline;",
-            "cursor: pointer;",
-            "background: black;",
-            "border: solid 2px white;",
-            "border-radius: 22px;",
-          "}"
-        ].join("\n")
-      },
-      {
-        "code": "createPopup",
-        "name": "popup1",
-        "html": "<div><h2>POPUP1</h2></div>"
-      }
-    ])
+  function appendToHead(ele) {
+    var head = document.getElementsByTagName('head')[0];
+    head.appendChild(ele);
+  }
+
+  function selectElement(selector) {
+    return selector ? document.querySelector(selector) : document.body;
   }
 
   const INSTRUCTION_DISPATCH = {
+    loadModule: function(instruction) {
+      // For future expansion.
+    },
+    appendStylesheet: function(instruction) {
+      var link = document.createElement("link");
+      link.type = "text/css";
+      link.rel = "stylesheet";
+      link.href = getRelativeUrl(instruction.url);
+      appendToHead(link);
+    },
     appendStyle: function(instruction) {
-      appendStyle(instruction.style);
+      var text = instruction.style || ""
+      var styleEle = document.createElement('style');
+      styleEle.type = "text/css";
+      styleEle.appendChild(document.createTextNode(text));
+      appendToHead(styleEle);
     },
     appendHtml: function(instruction) {
-      appendHtml(instruction.selector, instruction.html)
+      var parent = selectElement(instruction.selector);
+      var html = instruction.html || "";
+      parent.innerHTML += html;
     },
     addClass: function(instruction) {
-      addClass(instruction.selector, instruction["class"])
+      var ele = selectElement(instruction.selector);
+      ele.classList.add(instruction["class"]);
     },
     removeClass: function(instruction) {
-      removeClass(instruction.selector, instruction["class"])
+      var ele = selectElement(instruction.selector);
+      ele.classList.remove(instruction["class"]);
     },
-    createPopup: function(instruction) {
-      createPopup(instruction.name, instruction.html)
-    },
-    handleClick: function(instruction) {
-      handleClick(instruction.selector, instruction.action)
+    handleEvent: function(instruction) {
+      var selector = instruction.selector || "a[href]";
+      var targets = document.querySelectorAll(selector);
+      var eventType = instruction.eventType || "click";
+      var action = instruction.action || []
+      for (var i = 0; i < targets.length; ++i) {
+        targets[i].addEventListener(eventType, function(e) {
+          console.log(e.type, e.target, action);
+          e.preventDefault();
+          if (instruction.stopPropagation) {
+            e.stopPropagation();
+          }
+          execute(action);
+        })
+      }
     }
   }
 
-  function executeInstruction(instruction) {
+  function execute(instruction) {
     if (instruction) {
       if (Array.isArray(instruction)) {
-        instruction.forEach(executeInstruction)
+        instruction.forEach(execute)
       }
       else {
         INSTRUCTION_DISPATCH[instruction.code](instruction)
@@ -131,91 +97,81 @@
     }
   }
 
-  function appendHtml(selector, html) {
-    var parent = selector ? document.querySelector(selector) : document.body;
-    parent.innerHTML += html;
+  // Macros.
+  INSTRUCTION_DISPATCH["showModal"] = function(instruction) {
+    execute({
+      "code": "addClass",
+      "class": instruction.name + "-shown"
+    })
+  }
+  
+  INSTRUCTION_DISPATCH["closeModal"] = function(instruction) {
+    execute({
+      "code": "removeClass",
+      "class": instruction.name + "-shown"
+    })
   }
 
-  function addClass(selector, _class) {
-    var ele = selector ? document.querySelector(selector) : document.body;
-    ele.classList.add(_class);
-  }
-
-  function removeClass(selector, _class) {
-    var ele = selector ? document.querySelector(selector) : document.body;
-    ele.classList.remove(_class);
-  }
-
-  function createPopup(name, html) {
-    executeInstruction([
-      {
-        "code": "appendHtml",
-        "html": [
-          "<div class='optin-modal-screen optin-modal-screen-" + name + " optin-modal-root-" + name + "'>",
-            "<div class='optin-modal-frame " + name + "'>",
-              "<button class='optin-close-button'>×</button>",
-              "<div class='optin-modal-content optin-modal-content-" + name + "'>",
+  INSTRUCTION_DISPATCH["createModal"] = function(instruction) {
+    (function(name, html) {
+      execute([
+        {
+          "code": "appendHtml",
+          "html": [
+            "<div class='optin-modal-screen optin-modal-screen-" + name + " optin-modal-root-" + name + "'>",
+              "<div class='optin-modal-frame optin-modal-frame-" + name + "'>",
+                "<button class='optin-close-button'>×</button>",
+                "<div class='optin-modal-content optin-modal-content-" + name + "'>",
+                "</div>",
               "</div>",
-            "</div>",
-          "</div>"
-        ].join("")
-      },
-      {
-        "code": "appendHtml",
-        "selector": "div.optin-modal-content-" + name,
-        "html": html
-      },
-      {
-        "code": "appendStyle",
-        "style": [
-          "body:not(." + name + "-shown) .optin-modal-root-" + name + " {",
-            "display: none;",
-          "}"
-        ].join(" ")
-      },
-      {
-        "code": "handleClick",
-        "selector": "a[href='#" + name + "']",
-        "action": {
-          "code": "addClass",
-          "class": name + "-shown"
+            "</div>"
+          ].join("")
+        },
+        {
+          "code": "appendHtml",
+          "selector": "div.optin-modal-content-" + name,
+          "html": html
+        },
+        {
+          "code": "appendStyle",
+          "style": [
+            "body:not(." + name + "-shown) .optin-modal-root-" + name + " {",
+              "display: none;",
+            "}"
+          ].join(" ")
+        },
+        {
+          "code": "handleEvent",
+          "selector": "a[href='#" + name + "']",
+          "action": {
+            "code": "showModal",
+            "name": name
+          }
+        },
+        {
+          "code": "handleEvent",
+          "selector": "div.optin-modal-screen-" + name,
+          "action": {
+            "code": "closeModal",
+            "name": name
+          }
+        },
+        {
+          "code": "handleEvent",
+          "selector": "div.optin-modal-frame-" + name,
+          "stopPropagation": true
+        },
+        {
+          "code": "handleEvent",
+          "selector": "div.optin-modal-frame-" + name + " .optin-close-button", 
+          "action": {
+            "code": "closeModal",
+            "name": name
+          }
         }
-      },
-      {
-        "code": "handleClick",
-        "selector": "div.optin-modal-screen-" + name,
-        "action": {
-          "code": "removeClass",
-          "class": name + "-shown"
-        }
-      },
-      {
-        "code": "handleClick",
-        "selector": "div.optin-modal-frame." + name + " div.optin-close-container", 
-        "action": {
-          "code": "removeClass",
-          "class": name + "-shown"
-        }
-      }
-    ])
-  }
-
-  function appendStyle(style) {
-    var head = document.getElementsByTagName('head')[0];
-    var styles  = document.createElement('style');
-    styles.appendChild(document.createTextNode(style));
-    head.appendChild(styles);
-  }
-
-  function handleClick(selector, action) {
-    var links = document.querySelectorAll(selector);
-    for (var i = 0; i < links.length; ++i) {
-      links[i].addEventListener("click", function(e) {
-        e.preventDefault();
-        executeInstruction(action);
-      })
-    }
-  }
+      ]);
+    })(instruction.name, instruction.html);
+  };
 
   // Wait for page to load.
   function whenPageLoaded(callback) {
@@ -237,6 +193,35 @@
     }
   }
 
+  function getConfigFileUrl() {
+    const queryString = src.replace(/^[^\?]+\??/, "");
+    const fileName = (queryString.split("&")[0] || "demo1") + ".json";
+    return getRelativeUrl(fileName);
+  }
+
+  // Wait for configuration to load.
+  function whenConfigLoaded(callback) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", getConfigFileUrl());
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.send();
+    xhr.responseType = "json";
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        callback(xhr.response)
+      }
+    }
+  }
+
+  execute({
+    "code": "appendStylesheet",
+    "url": "optin-modal.css"
+  })
+
   // Main.
-  whenPageLoaded(initialize)
+  whenConfigLoaded(function(config) {
+    whenPageLoaded(function() {
+      execute(config)
+    })
+  })
 })();

@@ -1,0 +1,11 @@
+[
+  {
+    "code": "loadModule",
+    "name": "optin-modal"
+  },
+  {
+    "code": "createModal",
+    "name": "popup1",
+    "html": "<div><h2>THIS IS POPUP1</h2><p>Some text here.</p></div>"
+  }
+]

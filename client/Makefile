@@ -1,10 +1,16 @@
-minified: build/videosdr-min.js build/optin-min.js
+minified: build/videosdr-min.js build/optin-min.js build/demo1.json build/optin-modal.css
 
 build/videosdr-min.js: build videosdr.js
 	../node_modules/.bin/minify videosdr.js > build/videosdr-min.js
 
 build/optin-min.js: build optin.js
 	../node_modules/.bin/minify optin.js > build/optin-min.js
+
+build/demo1.json: demo1.json
+	cp demo1.json build
+
+build/optin-modal.json: optin-modal.json
+	cp optin-modal.json build
 
 deploy: check-aws-env minified
 	aws s3 --profile ${AWS_PROFILE} sync ./build s3://${CODE_BUCKET_NAME} --exclude minifier.output
