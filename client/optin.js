@@ -7,25 +7,31 @@
     return scripts[scripts.length - 1];
   })();
 
-  // Polyfill for Array.prototype.forEach:
-  if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function (callback, thisArg) {
-      thisArg = thisArg || window;
-      for (var i = 0; i < this.length; i++) {
-        callback.call(thisArg, this[i], i, this);
+  // Because Array.forEach isn't everywhere and isn't a member of NodeList.
+  function forEach(indexable, callback) {
+    if (indexable) {
+      if (typeof indexable.length === "undefined") {
+        indexable = [ indexable ]
+      }
+      for (var i = 0; i < indexable.length; ++i) {
+        callback(indexable[i]);
       }
     }
   }
 
   // Capture the source URL immediately.
-  const src = currentScript.src;
+  const SRC = currentScript.src;
 
   function getRelativeUrl(filePath) {
-    const baseSrc = src.match(/^[^\?]+/)[0];
+    const baseSrc = SRC.match(/^[^\?]+/)[0];
     const path = baseSrc.split("/");
     path.pop()
     path.push(filePath)
     return path.join("/");
+  }
+
+  function getQueryString() {
+    return SRC.replace(/^[^\?]+\??/, "");
   }
 
   function appendToHead(ele) {
@@ -55,41 +61,60 @@
       styleEle.appendChild(document.createTextNode(text));
       appendToHead(styleEle);
     },
+    applyStyles: function(instruction) {
+      var selector = instruction.selector || "";
+      var styles = instruction.styles || {};
+      forEach(document.querySelectorAll(selector), function(ele) {
+        for (var style in styles) {
+          ele.style[style] = styles[style];
+        }
+      })
+    },
     appendHtml: function(instruction) {
       var parent = selectElement(instruction.selector);
       var html = instruction.html || "";
-      parent.innerHTML += html;
+      var temp = document.createElement("div");
+      temp.innerHTML = html;
+      while (temp.childNodes.length > 0) {
+        parent.appendChild(temp.childNodes[0]);
+      }
     },
     addClass: function(instruction) {
       var ele = selectElement(instruction.selector);
-      ele.classList.add(instruction["class"]);
+      forEach(instruction["class"], function(cls) {
+        ele.classList.add(cls);
+      });
     },
     removeClass: function(instruction) {
       var ele = selectElement(instruction.selector);
-      ele.classList.remove(instruction["class"]);
+      forEach(instruction["class"], function(cls) {
+        ele.classList.remove(cls);
+      })
     },
     handleEvent: function(instruction) {
       var selector = instruction.selector || "a[href]";
       var targets = document.querySelectorAll(selector);
       var eventType = instruction.eventType || "click";
       var action = instruction.action || []
-      for (var i = 0; i < targets.length; ++i) {
-        targets[i].addEventListener(eventType, function(e) {
-          console.log(e.type, e.target, action);
+
+      forEach(targets, function(target) { 
+        console.log('handleEvent', target, action);
+        target.addEventListener(eventType, function(e) {
+          console.log('handleEvent!!!', target, action);
           e.preventDefault();
           if (instruction.stopPropagation) {
             e.stopPropagation();
           }
           execute(action);
         })
-      }
+      });
     }
   }
 
   function execute(instruction) {
     if (instruction) {
       if (Array.isArray(instruction)) {
-        instruction.forEach(execute)
+        forEach(instruction, execute)
       }
       else {
         INSTRUCTION_DISPATCH[instruction.code](instruction)
@@ -97,18 +122,24 @@
     }
   }
 
-  // Macros.
+  // ======= module optin-modal ============
+
+  execute({
+    "code": "appendStylesheet",
+    "url": "optin-modal.css"
+  })
+
   INSTRUCTION_DISPATCH["showModal"] = function(instruction) {
     execute({
       "code": "addClass",
-      "class": instruction.name + "-shown"
+      "class": [ "optin-modal-shown-" + instruction.name, "optin-modal-shown" ]
     })
   }
   
   INSTRUCTION_DISPATCH["closeModal"] = function(instruction) {
     execute({
       "code": "removeClass",
-      "class": instruction.name + "-shown"
+      "class": [ "optin-modal-shown-" + instruction.name, "optin-modal-shown" ]
     })
   }
 
@@ -135,18 +166,11 @@
         {
           "code": "appendStyle",
           "style": [
-            "body:not(." + name + "-shown) .optin-modal-root-" + name + " {",
-              "display: none;",
+            "body:not(.optin-modal-shown-" + name + ") .optin-modal-root-" + name + " {",
+              "visibility: hidden;",
+              "opacity: 0;",
             "}"
           ].join(" ")
-        },
-        {
-          "code": "handleEvent",
-          "selector": "a[href='#" + name + "']",
-          "action": {
-            "code": "showModal",
-            "name": name
-          }
         },
         {
           "code": "handleEvent",
@@ -173,6 +197,41 @@
     })(instruction.name, instruction.html);
   };
 
+  // ======= module optin-hover ============
+
+  execute({
+    "code": "appendStylesheet",
+    "url": "optin-hover.css"
+  })
+
+  INSTRUCTION_DISPATCH["createHover"] = function(instruction) {
+    (function(name, html, styles) {
+      execute([
+        {
+          "code": "appendHtml",
+          "html": [
+            "<div class='optin-hover-frame optin-hover-frame-" + name + "'>",
+              "<button class='optin-hover-button optin-hover-button-" + name + "'>",
+              "</button>",
+            "</div>"
+          ].join("")
+        },
+        {
+          "code": "appendHtml",
+          "selector": ".optin-hover-button-" + name,
+          "html": html
+        },
+        {
+          "code": "applyStyles",
+          "selector": ".optin-hover-frame-" + name,
+          "styles": styles
+        }
+      ]);
+    })(instruction.name, instruction.html, instruction.styles || {});
+  };
+
+  // ======= end module optin-hover ============
+
   // Wait for page to load.
   function whenPageLoaded(callback) {
     if (document.readyState != "loading") {
@@ -194,8 +253,7 @@
   }
 
   function getConfigFileUrl() {
-    const queryString = src.replace(/^[^\?]+\??/, "");
-    const fileName = (queryString.split("&")[0] || "demo1") + ".json";
+    const fileName = (getQueryString().split("&")[0] || "demo1") + ".json";
     return getRelativeUrl(fileName);
   }
 
@@ -212,11 +270,6 @@
       }
     }
   }
-
-  execute({
-    "code": "appendStylesheet",
-    "url": "optin-modal.css"
-  })
 
   // Main.
   whenConfigLoaded(function(config) {

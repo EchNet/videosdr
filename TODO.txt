@@ -1,7 +1,5 @@
-Write the hoverbutton macros.
+Show transition.
 
-Style the hoverbutton container.
+Finish demo page.
 
-Deploy.
-
-Create public demo.
+Deploy public demo.

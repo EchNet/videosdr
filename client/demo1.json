@@ -1,11 +1,58 @@
 [
   {
     "code": "loadModule",
-    "name": "optin-modal"
+    "name": "optin-modal",
+    "comment": "Load support for modal popups. Enables createModal."
+  },
+  {
+    "code": "loadModule",
+    "name": "optin-hover",
+    "comment": "Load support for hover buttons.  Enables createHover."
   },
   {
     "code": "createModal",
     "name": "popup1",
-    "html": "<div><h2>THIS IS POPUP1</h2><p>Some text here.</p></div>"
+    "html": "<div><h2>POPUP #1</h2><p>Some text here.</p></div>",
+    "comment": "Creates the first test modal popup."
+  },
+  {
+    "code": "handleEvent",
+    "eventType": "click",
+    "selector": "a[href='#popup1']",
+    "action": {
+      "code": "showModal",
+      "name": "popup1"
+    },
+    "comment": "Launches the first test modal popup when link is clicked."
+  },
+  {
+    "code": "createModal",
+    "name": "popup2",
+    "html": "<div><h2>POPUP #2</h2><p>Some different text here.</p></div>",
+    "comment": "Creates the second test modal popup."
+  },
+  {
+    "code": "createHover",
+    "name": "hover1",
+    "html": "<div><video autoplay='' loop='' muted='true' playsinline='' src='https://media.videoask.com/transcoded/749db88f-4e22-45b0-9bfc-9fdb2eeba7b9/embed.mp4?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJtZWRpYV9pZCI6Ijc0OWRiODhmLTRlMjItNDViMC05YmZjLTlmZGIyZWViYTdiOSIsImV4cCI6MTYxMDQxNDc0OX0.DCZXlqyBaEJTzx6u8FFRtrpkLkj9QJPnw5IRkH1N_DrTr8ZJFfpYxKtzpVN8xaqGz73I1PQzU7qjsZRklQVjN_B-iiGijzDvbHL5w2lE_fIx9j1VWX1ljWyKNtEq4KmWsDtoQCy9C3NHZWuW-SZAyNH7me3u0hhWsHOltBuqKCEexVM1QFgAnYVFv58x_8N0MMst361Obpqmfp7OAMQjaMaT2RWG0Y48fnYo-4-c6CIh8zlx083ahvxrfCZ7JfN-dL3tFhNjO2dAjyZd_RKqxDU_VmrB0hnn1Svl2ROU2OMXcKYSuh2pJg9issNeiXUuMmkFTfwB4g4TWZ7PlxD_Ue7s8Vdyb5QuBaBCT0UoQPCbL89b-GJBv0gtvL-gX4wpPDM4OF3rQMgydD51f2Ujxbnyf2gXVoYFiU3LpqfEDjeMA-5Dv9osY9aLM9NzUo58CQHNHTOdPyAn_JHDJ33XRfwPkylAVY9G0GDUMQGWDYEiHg80n1UdUIIm_Roaz1q-Is3T2aqgP6EIWraEsEP6lF57W0tUQQeDPJlh5ck4oFk2l8ziYMCIVS8GII24785C9cuGwxZCKVmWpp0Ehuzgd7x2wt1UbjtlkfTGjs3wSzeY6DZHLcFR9rZoKENruiE-OUPDzDn-gLemTifwmI_am62MPjTpAn3ih65lyXFL99M' style='object-position: 50% 50%; width: 100%; height: 100%;'></video>",
+    "styles": {
+      "width": "166px",
+      "height": "224px",
+      "bottom": "29px",
+      "right": "35px",
+      "border": "6px solid rgb(0,190,254)",
+      "borderRadius": "20px"
+    },
+    "comment": "Creates a hover button at lower right."
+  },
+  {
+    "code": "handleEvent",
+    "eventType": "click",
+    "selector": ".optin-hover-button-hover1",
+    "action": {
+      "code": "showModal",
+      "name": "popup2"
+    },
+    "comment": "Launches the second test modal popup when the hover button is clicked."
   }
 ]

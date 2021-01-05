@@ -1,4 +1,4 @@
-div.optin-modal-screen {
+.optin-modal-screen {
   position: fixed;
   top: 0;
   left: 0;
@@ -6,8 +6,11 @@ div.optin-modal-screen {
   height: 100%;
   background: rgba(128,128,128,0.5);
   z-index: 2000000;
+  visibility: visible;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
 }
-div.optin-modal-frame {
+.optin-modal-frame {
   position: relative;
   width: 100%;
   max-width: 480px;
@@ -21,11 +24,11 @@ div.optin-modal-frame {
   background: white;
   z-index: 2000001;
 }
-div.optin-modal-content {
+.optin-modal-content {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 12px;
 }
-button.optin-close-button {
+.optin-close-button {
   padding: 0 3px 0 4px;
   display: block;
   font-size: 20px;
