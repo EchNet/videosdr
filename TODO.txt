@@ -1,5 +1,0 @@
-Show transition.
-
-Finish demo page.
-
-Deploy public demo.

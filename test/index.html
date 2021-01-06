@@ -2,10 +2,60 @@
 <html>
 <head>
   <title>VideoSDR</title>
-  <script defer src="../client/optin.js"></script>
+  <script defer src="../client/optin.js?demo1"></script>
+  <!--
+  <script defer src="https://s3.amazonaws.com/code.videosdr.com/optin-min.js?demo1"></script>
+  -->
 </head>
+<style>
+body {
+  font-family: "Helvetica Neue",Helvetica,Arial;
+}
+header {
+  background: #ffe;
+  padding: 10px;
+  display: flex;
+  font-size: 36px;
+  letter-spacing: 5px;
+  font-weight: 600;
+  align-items: center;
+  justify-content: space-between;
+  color: #48d;
+}
+.wow {
+  margin: 20px;
+  font-size: 18px;
+}
+.spacer {
+  height: 75px;
+  background: #48d;
+  margin-top: 10px;
+}
+button {
+  font-size: 18px;
+}
+</style>
 <body>
-  <h1>VidVoy opt-in test</h1>
-  <a href="#popup1">Click to launch</a>
+  <header>
+    <img src="vidvoy.png"> <span>DEMO</span>
+  </header>
+  <div class="spacer"></div>
+  <div class="wow">
+    This is a demo of Convo360/VidVoy's <b>customized opt-in functionality.</b>
+  </div>
+  <div class="spacer"></div>
+  <div class="wow">
+    <a href="#popup1"><button style="">Click here to see the first pop-up</button></a>
+  </div>
+  <div class="spacer"></div>
+  <div class="wow">
+    Click on the talking face to demonstrate peaceful coexistence of multiple pop-ups in the
+    same page.
+  </div>
+  <div class="spacer"></div>
+  <div class="wow">
+    <a target="_blank" href="https://s3.amazonaws.com/code.videosdr.com/demo1.json">Click here</a>
+    for a peek at the instructions that make this page go.
+  </div>
 </body>
 </html>

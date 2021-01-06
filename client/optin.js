@@ -98,9 +98,7 @@
       var action = instruction.action || []
 
       forEach(targets, function(target) { 
-        console.log('handleEvent', target, action);
         target.addEventListener(eventType, function(e) {
-          console.log('handleEvent!!!', target, action);
           e.preventDefault();
           if (instruction.stopPropagation) {
             e.stopPropagation();
