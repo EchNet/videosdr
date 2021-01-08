@@ -22,6 +22,16 @@
   // Capture the source URL immediately.
   const SRC = currentScript.src;
 
+  function getText(obj) {
+    if (!obj) {
+      return "";
+    }
+    if (Array.isArray(obj)) {
+      return obj.join("");
+    }
+    return obj.toString();
+  }
+
   function getRelativeUrl(filePath) {
     const baseSrc = SRC.match(/^[^\?]+/)[0];
     const path = baseSrc.split("/");
@@ -72,7 +82,7 @@
     },
     appendHtml: function(instruction) {
       var parent = selectElement(instruction.selector);
-      var html = instruction.html || "";
+      var html = getText(instruction.html);
       var temp = document.createElement("div");
       temp.innerHTML = html;
       while (temp.childNodes.length > 0) {
@@ -99,7 +109,7 @@
 
       forEach(targets, function(target) { 
         target.addEventListener(eventType, function(e) {
-          e.preventDefault();
+          //e.preventDefault();
           if (instruction.stopPropagation) {
             e.stopPropagation();
           }
@@ -192,7 +202,7 @@
           }
         }
       ]);
-    })(instruction.name, instruction.html);
+    })(instruction.name, getText(instruction.html));
   };
 
   // ======= module optin-hover ============
@@ -225,7 +235,7 @@
           "styles": styles
         }
       ]);
-    })(instruction.name, instruction.html, instruction.styles || {});
+    })(instruction.name, getText(instruction.html), instruction.styles || {});
   };
 
   // ======= end module optin-hover ============

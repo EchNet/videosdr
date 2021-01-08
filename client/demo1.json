@@ -34,13 +34,26 @@
   {
     "code": "createHover",
     "name": "hover1",
-    "html": "<div><video autoplay='' loop='' muted='true' playsinline='' src='https://media.videoask.com/transcoded/749db88f-4e22-45b0-9bfc-9fdb2eeba7b9/embed.mp4?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJtZWRpYV9pZCI6Ijc0OWRiODhmLTRlMjItNDViMC05YmZjLTlmZGIyZWViYTdiOSIsImV4cCI6MTYxMDQxNDc0OX0.DCZXlqyBaEJTzx6u8FFRtrpkLkj9QJPnw5IRkH1N_DrTr8ZJFfpYxKtzpVN8xaqGz73I1PQzU7qjsZRklQVjN_B-iiGijzDvbHL5w2lE_fIx9j1VWX1ljWyKNtEq4KmWsDtoQCy9C3NHZWuW-SZAyNH7me3u0hhWsHOltBuqKCEexVM1QFgAnYVFv58x_8N0MMst361Obpqmfp7OAMQjaMaT2RWG0Y48fnYo-4-c6CIh8zlx083ahvxrfCZ7JfN-dL3tFhNjO2dAjyZd_RKqxDU_VmrB0hnn1Svl2ROU2OMXcKYSuh2pJg9issNeiXUuMmkFTfwB4g4TWZ7PlxD_Ue7s8Vdyb5QuBaBCT0UoQPCbL89b-GJBv0gtvL-gX4wpPDM4OF3rQMgydD51f2Ujxbnyf2gXVoYFiU3LpqfEDjeMA-5Dv9osY9aLM9NzUo58CQHNHTOdPyAn_JHDJ33XRfwPkylAVY9G0GDUMQGWDYEiHg80n1UdUIIm_Roaz1q-Is3T2aqgP6EIWraEsEP6lF57W0tUQQeDPJlh5ck4oFk2l8ziYMCIVS8GII24785C9cuGwxZCKVmWpp0Ehuzgd7x2wt1UbjtlkfTGjs3wSzeY6DZHLcFR9rZoKENruiE-OUPDzDn-gLemTifwmI_am62MPjTpAn3ih65lyXFL99M' style='object-position: 50% 50%; width: 100%; height: 100%;'></video>",
+    "html": [
+      "<div style='position: relative;'>",
+        "<video autoplay='' loop='' muted='true' playsinline='' ",
+          "src='https://media.videoask.com/transcoded/749db88f-4e22-45b0-9bfc-9fdb2eeba7b9/embed.mp4?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJtZWRpYV9pZCI6Ijc0OWRiODhmLTRlMjItNDViMC05YmZjLTlmZGIyZWViYTdiOSIsImV4cCI6MTYxMDQxNDc0OX0.DCZXlqyBaEJTzx6u8FFRtrpkLkj9QJPnw5IRkH1N_DrTr8ZJFfpYxKtzpVN8xaqGz73I1PQzU7qjsZRklQVjN_B-iiGijzDvbHL5w2lE_fIx9j1VWX1ljWyKNtEq4KmWsDtoQCy9C3NHZWuW-SZAyNH7me3u0hhWsHOltBuqKCEexVM1QFgAnYVFv58x_8N0MMst361Obpqmfp7OAMQjaMaT2RWG0Y48fnYo-4-c6CIh8zlx083ahvxrfCZ7JfN-dL3tFhNjO2dAjyZd_RKqxDU_VmrB0hnn1Svl2ROU2OMXcKYSuh2pJg9issNeiXUuMmkFTfwB4g4TWZ7PlxD_Ue7s8Vdyb5QuBaBCT0UoQPCbL89b-GJBv0gtvL-gX4wpPDM4OF3rQMgydD51f2Ujxbnyf2gXVoYFiU3LpqfEDjeMA-5Dv9osY9aLM9NzUo58CQHNHTOdPyAn_JHDJ33XRfwPkylAVY9G0GDUMQGWDYEiHg80n1UdUIIm_Roaz1q-Is3T2aqgP6EIWraEsEP6lF57W0tUQQeDPJlh5ck4oFk2l8ziYMCIVS8GII24785C9cuGwxZCKVmWpp0Ehuzgd7x2wt1UbjtlkfTGjs3wSzeY6DZHLcFR9rZoKENruiE-OUPDzDn-gLemTifwmI_am62MPjTpAn3ih65lyXFL99M' ",
+          "style='object-position: 50% 50%; width: 100%; height: 100%;'>",
+        "</video>",
+        "<div style='position: absolute; top:0; left:0; width:100%; height:100%; opacity:10%; background:black;'>",
+        "</div>",
+        "<div style='position: absolute; bottom:80px; width:100%; color:white; font-size:10px;'>",
+          "Widget &#x26a1; by ",
+          "<a href='https://convo360.com' target='_blank' style='color:white;'>Convo360</a>",
+        "</div>",
+      "</div>"
+    ],
     "styles": {
       "width": "166px",
       "height": "224px",
       "bottom": "29px",
       "right": "35px",
-      "border": "6px solid rgb(0,190,254)",
+      "border": "6px solid rgb(80,204,128)",
       "borderRadius": "20px"
     },
     "comment": "Creates a hover button at lower right."
