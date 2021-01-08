@@ -138,9 +138,13 @@
   })
 
   INSTRUCTION_DISPATCH["showModal"] = function(instruction) {
+    var name = instruction.name;
     execute({
+      "code": "checkAppendHtml",
+      "name": instruction.name
+    }, {
       "code": "addClass",
-      "class": [ "optin-modal-shown-" + instruction.name, "optin-modal-shown" ]
+      "class": [ "optin-modal-shown-" + name, "optin-modal-shown" ]
     })
   }
   
@@ -155,7 +159,7 @@
     (function(name, html) {
       execute([
         {
-          "code": "appendHtml",
+          "code": "appendHtmlLazy",
           "html": [
             "<div class='optin-modal-screen optin-modal-screen-" + name + " optin-modal-root-" + name + "'>",
               "<div class='optin-modal-frame optin-modal-frame-" + name + "'>",

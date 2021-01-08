@@ -16,8 +16,8 @@ build/optin-hover.css: optin-hover.css
 	cp optin-hover.css build
 
 deploy: check-aws-env minified
-	aws s3 --profile ${AWS_PROFILE} sync ./build s3://${CODE_BUCKET_NAME} --exclude minifier.output
-	aws s3 --profile ${AWS_PROFILE} cp --content-type 'application/js; charset=utf-8' ./build/optin-min.js s3://${CODE_BUCKET_NAME}
+	aws s3 --profile ${AWS_PROFILE} sync ./build ${OPTIN_HOME} --exclude minifier.output
+	aws s3 --profile ${AWS_PROFILE} cp --content-type 'application/js; charset=utf-8' ./build/optin-min.js ${OPTIN_HOME}/optin-min.js
 
 build:
 	mkdir -p build
@@ -31,4 +31,7 @@ ifndef AWS_PROFILE
 endif
 ifndef CODE_BUCKET_NAME
 	$(error CODE_BUCKET_NAME is undefined)
+endif
+ifndef OPTIN_HOME
+	$(error OPTIN_HOME is undefined)
 endif

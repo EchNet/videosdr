@@ -12,7 +12,12 @@
   {
     "code": "createModal",
     "name": "popup1",
-    "html": "<div><h2>POPUP #1</h2><p>Some text here.</p></div>",
+    "html": [
+      "<iframe src='https://msgsndr.com/widget/form/LrDGSe79qs7YW1OO2ln3' ",
+         "style='border:none;width:100%;' scrolling='no' ",
+         "id='LrDGSe79qs7YW1OO2ln3'></iframe>",
+      "<script src='https://msgsndr.com/js/form_embed.js'></script>"
+    ],
     "comment": "Creates the first test modal popup."
   },
   {
