@@ -2,3 +2,4 @@ export AWS_PROFILE=admin
 export AWS_REGION=us-east-1
 export S3_BUCKET_NAME=videosdr.ech.net
 export CODE_BUCKET_NAME=videosdr.ech.net
+export OPTIN_HOME=s3://videosdr.ech.net/OptIn
