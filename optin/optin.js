@@ -57,19 +57,18 @@
     loadModule: function(instruction) {
       // For future expansion.
     },
-    appendStylesheet: function(instruction) {
-      var link = document.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = getRelativeUrl(instruction.url);
-      appendToHead(link);
-    },
-    appendStyle: function(instruction) {
-      var text = instruction.style || ""
-      var styleEle = document.createElement('style');
-      styleEle.type = "text/css";
-      styleEle.appendChild(document.createTextNode(text));
-      appendToHead(styleEle);
+    addStylesheet: function(instruction) {
+      var is_inline = instruction.text != null;
+      var ele = document.createElement(is_inline ? "style" : "link");
+      if (is_inline) {
+        ele.appendChild(document.createTextNode(getText(instruction.text)));
+      }
+      else {
+        ele.rel = "stylesheet";
+        ele.href = getRelativeUrl(instruction.url);
+      }
+      ele.type = "text/css";
+      appendToHead(ele);
     },
     applyStyles: function(instruction) {
       var selector = instruction.selector || "";
@@ -133,16 +132,13 @@
   // ======= module optin-modal ============
 
   execute({
-    "code": "appendStylesheet",
+    "code": "addStylesheet",
     "url": "optin-modal.css"
   })
 
   INSTRUCTION_DISPATCH["showModal"] = function(instruction) {
     var name = instruction.name;
     execute({
-      "code": "checkAppendHtml",
-      "name": instruction.name
-    }, {
       "code": "addClass",
       "class": [ "optin-modal-shown-" + name, "optin-modal-shown" ]
     })
@@ -159,7 +155,7 @@
     (function(name, html) {
       execute([
         {
-          "code": "appendHtmlLazy",
+          "code": "appendHtml",
           "html": [
             "<div class='optin-modal-screen optin-modal-screen-" + name + " optin-modal-root-" + name + "'>",
               "<div class='optin-modal-frame optin-modal-frame-" + name + "'>",
@@ -176,13 +172,13 @@
           "html": html
         },
         {
-          "code": "appendStyle",
-          "style": [
+          "code": "addStylesheet",
+          "text": [
             "body:not(.optin-modal-shown-" + name + ") .optin-modal-root-" + name + " {",
               "visibility: hidden;",
               "opacity: 0;",
             "}"
-          ].join(" ")
+          ]
         },
         {
           "code": "handleEvent",
@@ -212,7 +208,7 @@
   // ======= module optin-hover ============
 
   execute({
-    "code": "appendStylesheet",
+    "code": "addStylesheet",
     "url": "optin-hover.css"
   })
 
@@ -232,11 +228,6 @@
           "code": "appendHtml",
           "selector": ".optin-hover-button-" + name,
           "html": html
-        },
-        {
-          "code": "applyStyles",
-          "selector": ".optin-hover-frame-" + name,
-          "styles": styles
         }
       ]);
     })(instruction.name, getText(instruction.html), instruction.styles || {});

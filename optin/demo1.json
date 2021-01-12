@@ -37,6 +37,28 @@
     "comment": "Creates the second test modal popup."
   },
   {
+    "code": "addStylesheet",
+    "text": [
+      ".optin-hover-frame-hover1 {",
+        "width: 166px;",
+        "height: 224px;",
+        "bottom: 29px;",
+        "right: 35px;",
+        "border: 6px solid rgb(50,74,102);",
+        "border-radius: 20px;",
+      "}",
+      "@media only screen and (max-width: 600px) {",
+        ".optin-hover-frame-hover1 {",
+          "width: 249px;",
+          "height: 336px;",
+          "border-width: 8px",
+          "border-radius: 30px;",
+        "}",
+      "}"
+    ],
+    "comment": "Style the hover button for desktop and mobile screens."
+  },
+  {
     "code": "createHover",
     "name": "hover1",
     "html": [
@@ -53,14 +75,6 @@
         "</div>",
       "</div>"
     ],
-    "styles": {
-      "width": "166px",
-      "height": "224px",
-      "bottom": "29px",
-      "right": "35px",
-      "border": "6px solid rgb(80,204,128)",
-      "borderRadius": "20px"
-    },
     "comment": "Creates a hover button at lower right."
   },
   {
