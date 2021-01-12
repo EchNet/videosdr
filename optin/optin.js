@@ -123,7 +123,7 @@
       if (Array.isArray(instruction)) {
         forEach(instruction, execute)
       }
-      else {
+      else if (!instruction.disabled) {
         INSTRUCTION_DISPATCH[instruction.code](instruction)
       }
     }
