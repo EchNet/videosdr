@@ -2,12 +2,15 @@
   0% {
     transform: translateY(200%);
   }
+  60% {
+    transform: translateY(200%);
+  }
   100% {
     transform: translateY(0);
   }
 }
 .optin-hover-frame {
-  animation: 1s ease-out 0s 1 slideInFromBelow;
+  animation: 2.5s ease-out 0s 1 slideInFromBelow;
   position: fixed;
   transition: all 0.2s ease-in-out;
   z-index: 1999999;
