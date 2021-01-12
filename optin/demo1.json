@@ -14,7 +14,7 @@
     "name": "popup1",
     "html": [
       "<iframe src='https://msgsndr.com/widget/form/LrDGSe79qs7YW1OO2ln3' ",
-         "style='border:none;width:100%;' scrolling='no' ",
+         "style='border:none;width:100%;min-height:450px;' scrolling='no' ",
          "id='LrDGSe79qs7YW1OO2ln3'></iframe>",
       "<script src='https://msgsndr.com/js/form_embed.js'></script>"
     ],
