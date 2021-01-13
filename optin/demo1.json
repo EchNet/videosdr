@@ -1,20 +1,36 @@
 [
   {
     "code": "loadModule",
-    "name": "optin-modal",
-    "comment": "Load support for modal popups. Enables createModal."
+    "comment": "Support for modal popups: enables createModal.",
+    "name": "optin-modal"
   },
   {
     "code": "loadModule",
-    "name": "optin-hover",
-    "comment": "Load support for hover buttons.  Enables createHover."
+    "comment": "Support for hover buttons: enables createHover.",
+    "name": "optin-hover"
+  },
+  {
+    "code": "addStylesheet",
+    "comment": "Style the modal popup for mobile screens.",
+    "text": [
+      "@media only screen and (max-device-width: 667px) and (orientation: portrait) {",
+        ".optin-close-button {",
+          "display: none;",
+        "}",
+      "} ",
+      "@media only screen and (max-device-width: 667px) and (orientation: landscape) {",
+        ".optin-close-button {",
+          "display: none;",
+        "}",
+      "}"
+    ]
   },
   {
     "code": "createModal",
     "name": "popup1",
     "html": [
       "<iframe src='https://msgsndr.com/widget/form/LrDGSe79qs7YW1OO2ln3' ",
-         "style='border:none;width:100%;min-height:450px;' scrolling='no' ",
+         "style='border:none;width:100%;padding:0;min-height:450px;' scrolling='no' ",
          "id='LrDGSe79qs7YW1OO2ln3'></iframe>",
       "<script src='https://msgsndr.com/js/form_embed.js'></script>"
     ],
@@ -32,12 +48,13 @@
   },
   {
     "code": "createModal",
+    "comment": "Creates the second test modal popup.",
     "name": "popup2",
-    "html": "<div><h2>POPUP #2</h2><p>Some different text here.</p></div>",
-    "comment": "Creates the second test modal popup."
+    "html": "<div><h2>POPUP #2</h2><p>Some different text here.</p></div>"
   },
   {
     "code": "addStylesheet",
+    "comment": "Style the hover button for desktop and mobile screens.",
     "text": [
       ".optin-hover-frame-hover1 {",
         "width: 166px;",
@@ -63,8 +80,7 @@
           "border-radius: 40px;",
         "}",
       "}"
-    ],
-    "comment": "Style the hover button for desktop and mobile screens."
+    ]
   },
   {
     "code": "createHover",
