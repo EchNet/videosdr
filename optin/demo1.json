@@ -10,22 +10,6 @@
     "name": "optin-hover"
   },
   {
-    "code": "addStylesheet",
-    "comment": "Style the modal popup for mobile screens.",
-    "text": [
-      "@media only screen and (max-device-width: 667px) and (orientation: portrait) {",
-        ".optin-close-button {",
-          "display: none;",
-        "}",
-      "} ",
-      "@media only screen and (max-device-width: 667px) and (orientation: landscape) {",
-        ".optin-close-button {",
-          "display: none;",
-        "}",
-      "}"
-    ]
-  },
-  {
     "code": "createModal",
     "name": "popup1",
     "html": [
@@ -38,13 +22,23 @@
   },
   {
     "code": "handleEvent",
-    "eventType": "click",
+    "comment": "Launches the first test modal popup when link is clicked - but not on mobile.",
     "selector": "a[href='#popup1']",
     "action": {
       "code": "showModal",
       "name": "popup1"
     },
-    "comment": "Launches the first test modal popup when link is clicked."
+    "disabled": "mobile"
+  },
+  {
+    "code": "handleEvent",
+    "comment": "Navigates to form page when link is clicked - only for mobile.",
+    "selector": "a[href='#popup1']",
+    "action": {
+      "code": "navigate",
+      "href": "https://msgsndr.com/widget/form/LrDGSe79qs7YW1OO2ln3"
+    },
+    "enabled": "mobile"
   },
   {
     "code": "createModal",
