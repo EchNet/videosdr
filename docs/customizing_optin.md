@@ -4,7 +4,7 @@
 
 * Access to the AWS console.
 
-* A text editor, or better, a JSON editor. [https://jsoneditoronline.org/](https://jsoneditoronline.org/) is one.
+* A JSON editor. [https://jsoneditoronline.org/](https://jsoneditoronline.org/) is one.
 
 ## To customize opt-in for a new customer:
 
@@ -16,14 +16,15 @@
 
 4. Download an existing .json file.
 
-5. Paste the contents of the .json file into a JSON or text editor.
+5. Paste the contents of the .json file into a JSON editor.
 
 6. Edit the contents (see below for Tips)
 
-7. Upload the edited file to NEWNAME.json 
+7. Rename the file to NEWNAME.json
 
-8. Present the customer with the code snippet:
+8. Upload the edited file to the OptIn folder of the S3 bucket.
 
+9. Present the customer with the code snippet:
 ```
 <script async defer src="https://s3.amazonaws.com/code.convo360.com/OptIn/optin-min.js?NEWNAME"></script>
 ```
@@ -47,10 +48,28 @@ Valid codes include:
 * showModal
 * createHover
 * handleEvent
+* navigate
 
 These are the building blocks that you use to describe your opt-in content and user interaction.
 
 Guides to customizing each of these appear below.
+
+### General
+
+A code block can be made to run only on mobile devices by adding an "enabled" property with
+value "mobile".
+
+A code block can be made to run only on NON-mobile devices by adding a "disabled" property
+with value "mobile.
+
+For example,
+```
+  {
+    "disabled": "mobile",
+    "code": "navigate",
+    "href": "http://foxnews.com"
+  }
+```
 
 ### createModal
 
@@ -90,6 +109,10 @@ page is loaded.
 Modal popups are initially invisible.  Use a showModal to make one visible.  The model is
 identified by its name.  This will usually happen within a handleEvent block.
 
+### navigate
+
+Takes the browser to a new page, identified by the href property.
+
 ### handleEvent
 
 A handleEvent block defines an interactive trigger in the page.  Usually, this defines 
@@ -105,7 +128,7 @@ A commonly used selector pattern is the following, which selects a link to an an
   a[href='#anchor']
 ```
 
-The action is another block, usually a showModal.
+The action is another block, usually a showModal or navigate.
 
 ### addStylesheet
 
