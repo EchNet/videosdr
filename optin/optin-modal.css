@@ -26,13 +26,13 @@
 }
 .optin-close-button {
   font-family: sans-serif;
-  padding: 0 3px;
   display: block;
-  font-size: 20px;
-  line-height: 20px;
+  width: 32px;
+  height: 32px;
+  font-size: 22px;
   position: absolute;
   top: -11px;
-  right: -9px;
+  right: -11px;
   z-index: 2000002;
   color: white;
   text-align: center;
@@ -40,5 +40,6 @@
   cursor: pointer;
   background: black;
   border: solid 2px white;
-  border-radius: 22px;
+  border-radius: 16px;
+  padding: 0 0 5px 0;
 }
