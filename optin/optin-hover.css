@@ -9,7 +9,7 @@
     transform: translateY(0);
   }
 }
-.optin-hover-frame {
+.optin-hover-button {
   animation: 2.5s ease-out 0s 1 slideInFromBelow;
   position: fixed;
   transition: all 0.2s ease-in-out;
@@ -17,18 +17,13 @@
   overflow: hidden;
   visibility: visible;
   opacity: 1;
-}
-.optin-hover-frame:hover {
-  transform: scale(1.1)
-}
-.optin-hover-button {
-  width: 100%;
-  height: 100%;
   text-decoration: none;
-  border: none;
   padding: 0;
 }
-body.optin-modal-shown .optin-hover-frame {
+.optin-hover-button:hover {
+  transform: scale(1.1)
+}
+body.optin-modal-shown .optin-hover-button {
   visibility: hidden;
   opacity: 0;
 }

@@ -241,10 +241,8 @@
         {
           "code": "appendHtml",
           "html": [
-            "<div class='optin-hover-frame optin-hover-frame-" + name + "'>",
-              "<button class='optin-hover-button optin-hover-button-" + name + "'>",
-              "</button>",
-            "</div>"
+            "<button class='optin-hover-button optin-hover-button-" + name + "'>",
+            "</button>"
           ].join("")
         },
         {
