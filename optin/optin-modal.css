@@ -16,10 +16,10 @@
   max-width: 800px;
   min-height: 400px;
   top: 50%;
+  transform: translateY(-50%);
   padding: 3px;
   text-align: center;
   margin: auto;
-  margin-top: -150px;
   border: solid 2px white;
   background: white;
   z-index: 2000001;
