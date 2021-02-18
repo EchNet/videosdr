@@ -1,5 +1,5 @@
 (function() {
-  var BUST_CACHE = true;
+  var BUST_CACHE = false;
   var userAgent = navigator.userAgent;
 
   // Hide template text.
@@ -266,6 +266,8 @@
 
   // Wait for page to load.
   function whenPageLoaded(callback) {
+    callback();
+    /*** it's not clear that this is necessary, now that we're waiting for the video element to appear before initializing.
     if (document.readyState != "loading") {
       // The document is already loaded.
       callback();
@@ -282,12 +284,13 @@
         }
       })
     }
+    ***/
   }
 
   function hasLocalStorage() {
     try {
-      localStorage.setItem("$test", "$test")
-      localStorage.removeItem("$test")
+      localStorage.setItem("vidvoy-$test", "$test")
+      localStorage.removeItem("vidvoy-$test")
       return true;
     }
     catch (e) {
@@ -296,8 +299,20 @@
 
   function clearLocalStorage() {
     for (var k in localStorage) {
-      localStorage.removeItem(k)
+      if (k.startsWith("vidvoy-")) {
+        localStorage.removeItem(k)
+      }
     }
+  }
+
+  function getLocalParams() {
+    var params = {}
+    for (var k in localStorage) {
+      if (k.startsWith("vidvoy-")) {
+        params[k.substring(7)] = localStorage[k];
+      }
+    }
+    return params;
   }
 
   function getQueryParams() {
@@ -333,7 +348,7 @@
     var queryParams = getQueryParams()
     var hasLocal = hasLocalStorage()
 
-    var key = queryParams["key"] || queryParams["k"] || (hasLocal && localStorage.getItem("key"))
+    var key = queryParams["key"] || queryParams["k"] || (hasLocal && localStorage.getItem("vidvoy-key"))
     if (key) {
       var request = new XMLHttpRequest();
       request.open("GET", options.getVideoParamsUrl + "?key=" + key);
@@ -359,14 +374,14 @@
         // Hide query parameters from address bar.
         history.replaceState("", "", location.origin + location.pathname);
         for (var k in queryParams) {
-          localStorage.setItem(k, queryParams[k]);
+          localStorage.setItem("vidvoy-" + k, queryParams[k]);
         }
       }
     }
 
     function finish(kvParams) {
       // URL query string parameters override keyed values.
-      callback(Object.assign({}, hasLocal && localStorage, kvParams, queryParams));
+      callback(Object.assign({}, hasLocal && getLocalParams(), kvParams, queryParams));
     }
   }
 
