@@ -4,7 +4,7 @@ build/videosdr-min.js: build videosdr.js
 	../node_modules/.bin/minify videosdr.js > build/videosdr-min.js
 
 deploy: check-aws-env minified
-	aws s3 --profile ${AWS_PROFILE} cp --content-type 'application/js; charset=utf-8' ./build/videosdr-min.js s3://${CODE_BUCKET_NAME}/videosdr-min.js
+	aws s3api --profile ${AWS_PROFILE} put-object --bucket ${CODE_BUCKET_NAME} --content-type 'application/js; charset=utf-8' --cache-control="max-age=3600" --key videosdr-min.js --body ./build/videosdr-min.js
 
 build:
 	mkdir -p build
